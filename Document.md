@@ -1,6 +1,7 @@
 # oxireun UI Library
 
-This documentation is for the Oxireun UI Library.
+
+
 
 ## Booting the Library
 
