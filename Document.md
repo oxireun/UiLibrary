@@ -86,4 +86,25 @@ end)
 MainSection:CreateSlider("Speed", 1, 100, 50, function(value)
 
 end)
+local MainSection = Window:NewSection("Credits")
+
+MainSection:CreateButton("Copy YouTube", function()
+  
+    setclipboard("https://youtube.com/@oxireun0?si=MxEKGtHSNZm9gTdQ")
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Copied!";
+        Text = "YouTube link copied to clipboard!";
+        Duration = 2;
+    })
+end)
+
+MainSection:CreateButton("Copy Discord", function()
+
+    setclipboard("https://discord.gg/6M7CBfT2PJ")
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Copied!";
+        Text = "Discord invite copied to clipboard!";
+        Duration = 2;
+    })
+end)
 ```
