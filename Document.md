@@ -112,7 +112,7 @@ local Window = Library:NewWindow(
 
 Window:SetFooter(
     "yt: oxireun", -- Footer Text
-    myIcon,        -- Footer Icon ID
+    12345,        -- Footer Icon ID
     2              -- Shape (1 = Round, 2 = Square)
 )
 
@@ -126,7 +126,7 @@ MainSection:CreateButton("Test Notification", function()
         "Hello!",                         -- Title
         "This is a custom notification.", -- Message
         3,                                -- Duration (Seconds)
-        myIcon,                           -- Icon ID
+        12345,                           -- Icon ID
         2                                 -- Shape (1 = Round, 2 = Square)
     )
 end)
