@@ -34,14 +34,11 @@ Window:SetFooter("yt: oxireun", 128337196312757, 2)
 ```
 
 ## Creating Sections (Tabs)
-
 ```lua
 local MainSection = Window:NewSection("Main")
 ```
 
-
 ### Button
-
 ```lua
 MainSection:CreateButton("Click Me", function()
     print("Button Clicked!")
@@ -49,7 +46,6 @@ end)
 ```
 
 ### Toggle
-
 ```lua
 MainSection:CreateToggle("Auto Farm", false, function(state)
     print("Toggle State:", state)
@@ -65,7 +61,6 @@ end)
 ```
 
 ### Textbox
-
 ```lua
 MainSection:CreateTextbox("Target Player", function(text)
     print("Searching for:", text)
@@ -73,7 +68,6 @@ end)
 ```
 
 ### Dropdown
-
 ```lua
 MainSection:CreateDropdown("Select Weapon", {"Sword", "Gun", "Knife"}, 1, function(selected)
     print("Equipped:", selected)
