@@ -70,7 +70,7 @@ end)
 
 ## Notification
 It auto-preloads your icons in the background and features a smooth, decreasing time bar.
-*   **Format:** `(Title, Text, Duration(time),color )`
+*   **Format:** `(Title, Text, Duration(time),decal,shape,color )`
 ```lua
 Library:SendNotification("Success!", "Script loaded perfectly.", 3, 128337196312757, 2, "green")
 ```
