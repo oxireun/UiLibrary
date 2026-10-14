@@ -18,7 +18,6 @@ local Window = Library:NewWindow("Oxireun Script", 128337196312757, 2, "grey")
 ```
 
 ## Available Themes
-You can change the entire look of the UI by passing one of these theme names:
 * `"black"` (OLED Dark)
 * `"grey"` (Sleek Graphite)
 * `"red"` (Crimson Red)
