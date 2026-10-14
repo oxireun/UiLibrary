@@ -12,21 +12,13 @@ We use **Smart Arguments**. You don't need to memorize the order! Just pass what
 *   you can pass something for example icon.
 *   **Big Number:** Logo ID for the floating icon (e.g., `128337196312757`).
 *   **Small Number:** Shape of the floating icon (`1` = Round, `2` = Square).
+* available colors`black` `grey` `red` `blue` `green` `pink` `orange` `yellow`
 
 ```lua
 local Window = Library:NewWindow("Oxireun Script", 128337196312757, 2, "grey")
 ```
 
-## Available Themes
-* `"black"` (OLED Dark)
-* `"grey"` (Sleek Graphite)
-* `"red"` (Crimson Red)
-* `"blue"` (Neon Cyan)
-* `"green"` (Lime Green)
-* `"pink"` (Deep Pink)
-* `"orange"` (Orange Red)
-* `"yellow"` (Bright Yellow)
-
+* 
 ## Adding a Footer
 Add a sleek watermark or credit to the bottom of the UI. Uses Smart Arguments (Text, IconID, Shape).
 ```lua
