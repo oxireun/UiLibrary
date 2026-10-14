@@ -5,17 +5,18 @@ include Smart Preloading, Custom Themes, Glassmorphism, Floating Logos, Dynamic
 Text Scaling, Anti-Cheat Protection (gethui), and a built-in Custom Notification
 System.
 
-🚀 Booting the Library
+## Booting the Library
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()
+```local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()```
 
-⚡ Preloading Icons (Optional)
+## Preloading Icons (Optional)
 
 Preload your image IDs so they instantly appear with zero delay when needed.
+-- not important because automatically it will do it.
 
-Library:PreloadIcons({128337196312757, 13809623192})
+```Library:PreloadIcons({128337196312757, 13809623192})```
 
-🪟 Creating a Window
+## Creating a Window
 
 The library uses Smart Arguments. You can pass arguments in any order!
 
