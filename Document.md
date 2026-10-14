@@ -37,7 +37,6 @@ Window:SetFooter("yt: oxireun", 128337196312757, 2)
 Sections act as your tabs. You can create as many as you need.
 ```lua
 local MainSection = Window:NewSection("Main")
-local CreditsSection = Window:NewSection("Credits")
 ```
 
 ---
