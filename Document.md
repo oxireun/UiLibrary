@@ -1,13 +1,13 @@
 # Oxireun UI Library
 
-A highly advanced, modern, and lightweight UI Library for Roblox. Features include Smart Preloading, Custom Themes, Glassmorphism, Floating Logos, Dynamic Text Scaling, Anti-Cheat Protection (`gethui`), and a built-in Custom Notification System.
+A highly advanced, modern, and lightweight UI Library for exploit. Features include Smart Preloading, Custom Themes, Glassmorphism, Floating Logos, Dynamic Text Scaling, Anti-Cheat Protection (`gethui`), and a built-in Custom Notification System.
 
 ## 🚀 Booting the Library
 ```lua
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()
 ```
 
-## 🪟 Creating a Window
+## Creating a Window
 We use **Smart Arguments**. You don't need to memorize the order! Just pass what you want:
 *   **String:** Window Title (e.g., `"My Hub"`) or Theme Name. (Leave blank for default Purple).
 *   **Big Number:** Logo ID for the floating icon (e.g., `128337196312757`).
@@ -34,7 +34,7 @@ Add a sleek watermark or credit to the bottom of the UI. Uses Smart Arguments (T
 Window:SetFooter("yt: oxireun", 128337196312757, 2)
 ```
 
-## 📁 Creating Sections (Tabs)
+## Creating Sections (Tabs)
 Sections act as your tabs. You can create as many as you need.
 ```lua
 local MainSection = Window:NewSection("Main")
@@ -43,10 +43,10 @@ local CreditsSection = Window:NewSection("Credits")
 
 ---
 
-## 🧩 UI Elements
+## UI Elements
 Add elements inside your sections. All text automatically scales to fit!
 
-### 🔘 Button
+### Button
 A simple clickable button.
 ```lua
 MainSection:CreateButton("Click Me", function()
@@ -54,7 +54,7 @@ MainSection:CreateButton("Click Me", function()
 end)
 ```
 
-### 🔛 Toggle
+### Toggle
 A switch for turning features on and off.
 ```lua
 MainSection:CreateToggle("Auto Farm", false, function(state)
@@ -62,7 +62,7 @@ MainSection:CreateToggle("Auto Farm", false, function(state)
 end)
 ```
 
-### 🎚️ Slider
+### Slider
 A smooth slider for adjusting numeric values. (Name, Min, Max, Default, Callback)
 ```lua
 MainSection:CreateSlider("WalkSpeed", 16, 100, 16, function(value)
@@ -70,7 +70,7 @@ MainSection:CreateSlider("WalkSpeed", 16, 100, 16, function(value)
 end)
 ```
 
-### 📝 Textbox
+### Textbox
 An input box for typing custom text or numbers.
 ```lua
 MainSection:CreateTextbox("Target Player", function(text)
@@ -78,7 +78,7 @@ MainSection:CreateTextbox("Target Player", function(text)
 end)
 ```
 
-### 🔽 Dropdown
+### Dropdown
 A menu to select an option from a list. (Name, Options Table, Default Index, Callback)
 ```lua
 MainSection:CreateDropdown("Select Weapon", {"Sword", "Gun", "Knife"}, 1, function(selected)
@@ -88,7 +88,7 @@ end)
 
 ---
 
-## 🔔 Custom Notifications
+## Custom Notifications
 Forget Roblox's default `SetCore`! Use our built-in notification system. It auto-preloads your icons in the background and features a smooth, decreasing time bar.
 *   **Format:** `(Title, Text, Duration, ...SmartArgs)`
 ```lua
@@ -97,7 +97,7 @@ Library:SendNotification("Success!", "Script loaded perfectly.", 3, 128337196312
 
 ---
 
-## 💎 Full Example Script
+## Full Example Script
 
 Here is a complete, working example using all the features of the Oxireun UI Library. Images load automatically in the background with zero manual preloading needed!
 
