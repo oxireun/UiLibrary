@@ -96,43 +96,45 @@ Library:SendNotification("Success!", "Script loaded perfectly.", 3, 128337196312
 Here is a complete, working example using all the features of the Oxireun UI Library. Images load automatically in the background with zero manual preloading needed!
 
 ```lua
+
 -- Anti-Duplicate: Prevents the UI from duplicating if executed multiple times
 if game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end
 
 -- Load the Library
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()
 
-local myIcon = 128337196312757
+local myIcon = 128337196312757 -- İkon ID'miz
 
--- Create Window (Title, LogoID, Square Shape, Grey Theme)
-local Window = Library:NewWindow("Oxireun Script", myIcon, 2, "grey")
+-- Create Window 
+local Window = Library:NewWindow("Oxireun Script", myIcon, 2, "grey") -- "Oxireun Script" = Başlık, myIcon = Logo ID, 2 = Dörtgen Şekil, "grey" = Tema
 
 -- Set Footer
-Window:SetFooter("yt: oxireun", myIcon, 2)
+Window:SetFooter("yt: oxireun", myIcon, 2) -- "yt: oxireun" = Alt Yazı, myIcon = İkon ID, 2 = Dörtgen Şekil
 
 -- ========================================== --
 -- MAIN SECTION
 -- ========================================== --
-local MainSection = Window:NewSection("Main")
+local MainSection = Window:NewSection("Main") -- "Main" = Sekme (Tab) Adı
 
-MainSection:CreateButton("Test Notification", function()
-    -- Sends a custom notification with a square icon
-    Library:SendNotification("Hello!", "This is a custom notification.", 3, myIcon, 2)
+MainSection:CreateButton("Test Notification", function() -- "Test Notification" = Buton Adı
+    
+    Library:SendNotification("Hello!", "This is a custom notification.", 3, myIcon, 2) -- "Hello!" = Başlık, "This is..." = Mesaj, 3 = Ekranda Kalma Süresi (Saniye), myIcon = İkon ID, 2 = Dörtgen Şekil
+
 end)
 
-MainSection:CreateToggle("Auto Farm", false, function(val)
+MainSection:CreateToggle("Auto Farm", false, function(val) -- "Auto Farm" = Toggle Adı, false = Kapalı olarak başlat
     print("Auto Farm:", val)
 end)
 
-MainSection:CreateTextbox("Search", function(text)
+MainSection:CreateTextbox("Search", function(text) -- "Search" = Kutunun içindeki ipucu yazısı
     print("Search for:", text)
 end)
 
-MainSection:CreateDropdown("Dropdown", {"Hello", "World"}, 1, function(selected)
+MainSection:CreateDropdown("Dropdown", {"Hello", "World"}, 1, function(selected) -- "Dropdown" = Adı, {"Hello", "World"} = Liste Seçenekleri, 1 = Başlangıçta 1. seçenek ("Hello") seçili olsun
     print("Selected:", selected)
 end)
 
-MainSection:CreateSlider("WalkSpeed", 16, 100, 16, function(val)
+MainSection:CreateSlider("WalkSpeed", 16, 100, 16, function(val) -- "WalkSpeed" = Adı, 16 = Minimum Limit, 100 = Maksimum Limit, 16 = Başlangıç Değeri
     if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = val
     end
@@ -141,29 +143,23 @@ end)
 -- ========================================== --
 -- CREDITS SECTION
 -- ========================================== --
-local CreditsSection = Window:NewSection("Credits")
+local CreditsSection = Window:NewSection("Credits") -- "Credits" = 2. Sekme (Tab) Adı
 
-CreditsSection:CreateButton("Copy YouTube", function()
+CreditsSection:CreateButton("Copy YouTube", function() -- "Copy YouTube" = Buton Adı
+  
     setclipboard("https://youtube.com/@oxireun0?si=MxEKGtHSNZm9gTdQ")
     
-    Library:SendNotification(
-        "Copied!", 
-        "YouTube link copied to clipboard!", 
-        3, 
-        myIcon, 
-        2 
-    )
+    Library:SendNotification("Copied!", "YouTube link copied to clipboard!", 3, myIcon, 2) -- 3 = Saniye, myIcon = İkon ID, 2 = Dörtgen
+    
 end)
 
-CreditsSection:CreateButton("Copy Discord", function()
+CreditsSection:CreateButton("Copy Discord", function() -- "Copy Discord" = Buton Adı
+
     setclipboard("https://discord.gg/6M7CBfT2PJ")
     
-    Library:SendNotification(
-        "Copied!", 
-        "Discord invite copied to clipboard!", 
-        3, 
-        myIcon, 
-        2 
-    )
+    Library:SendNotification("Copied!", "Discord invite copied to clipboard!", 3, myIcon, 2) -- 3 = Saniye, myIcon = İkon ID, 2 = Dörtgen
+    
 end)
+
+
 ```
