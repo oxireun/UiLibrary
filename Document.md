@@ -39,10 +39,6 @@ Sections act as your tabs. You can create as many as you need.
 local MainSection = Window:NewSection("Main")
 ```
 
----
-
-## UI Elements
-Add elements inside your sections. All text automatically scales to fit!
 
 ### Button
 A simple clickable button.
