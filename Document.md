@@ -76,7 +76,7 @@ end)
 
 ---
 
-## Custom Notifications
+## Notification
 It auto-preloads your icons in the background and features a smooth, decreasing time bar.
 *   **Format:** `(Title, Text, Duration, ...SmartArgs)`
 ```lua
