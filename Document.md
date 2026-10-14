@@ -98,13 +98,10 @@ Here is a complete, working example using all the features of the Oxireun UI Lib
 ```lua
 
 -- Anti-Duplicate: Prevents the UI from duplicating if executed multiple times
-if 
 
 if game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end -- Prevents duplicate UIs
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()
-
-local myIcon = 128337196312757 -- Your Decal/Image ID
 
 local Window = Library:NewWindow(
     "Oxireun Script", -- Window Title
