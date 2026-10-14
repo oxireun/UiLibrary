@@ -34,14 +34,14 @@ Window:SetFooter("yt: oxireun", 128337196312757, 2)
 ```
 
 ## Creating Sections (Tabs)
-Sections act as your tabs. You can create as many as you need.
+
 ```lua
 local MainSection = Window:NewSection("Main")
 ```
 
 
 ### Button
-A simple clickable button.
+
 ```lua
 MainSection:CreateButton("Click Me", function()
     print("Button Clicked!")
@@ -49,7 +49,7 @@ end)
 ```
 
 ### Toggle
-A switch for turning features on and off.
+
 ```lua
 MainSection:CreateToggle("Auto Farm", false, function(state)
     print("Toggle State:", state)
@@ -65,7 +65,7 @@ end)
 ```
 
 ### Textbox
-An input box for typing custom text or numbers.
+
 ```lua
 MainSection:CreateTextbox("Target Player", function(text)
     print("Searching for:", text)
@@ -73,7 +73,7 @@ end)
 ```
 
 ### Dropdown
-A menu to select an option from a list. (Name, Options Table, Default Index, Callback)
+
 ```lua
 MainSection:CreateDropdown("Select Weapon", {"Sword", "Gun", "Knife"}, 1, function(selected)
     print("Equipped:", selected)
@@ -83,7 +83,7 @@ end)
 ---
 
 ## Custom Notifications
-Forget Roblox's default `SetCore`! Use our built-in notification system. It auto-preloads your icons in the background and features a smooth, decreasing time bar.
+It auto-preloads your icons in the background and features a smooth, decreasing time bar.
 *   **Format:** `(Title, Text, Duration, ...SmartArgs)`
 ```lua
 Library:SendNotification("Success!", "Script loaded perfectly.", 3, 128337196312757, 2, "green")
