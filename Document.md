@@ -1,15 +1,15 @@
 # Oxireun UI Library
 
-A highly advanced, modern, and lightweight UI Library for exploit. Features include Smart Preloading, Custom Themes, Glassmorphism, Floating Logos, Dynamic Text Scaling, Anti-Cheat Protection (`gethui`), and a built-in Custom Notification System.
 
-## 🚀 Booting the Library
+## Booting the Library
 ```lua
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()
 ```
 
 ## Creating a Window
 We use **Smart Arguments**. You don't need to memorize the order! Just pass what you want:
-*   **String:** Window Title (e.g., `"My Hub"`) or Theme Name. (Leave blank for default Purple).
+*   **String:** Window Title (e.g., `"Oxireun script"`) or Theme Name.
+*   you can pass something for example icon.
 *   **Big Number:** Logo ID for the floating icon (e.g., `128337196312757`).
 *   **Small Number:** Shape of the floating icon (`1` = Round, `2` = Square).
 
@@ -17,7 +17,7 @@ We use **Smart Arguments**. You don't need to memorize the order! Just pass what
 local Window = Library:NewWindow("Oxireun Script", 128337196312757, 2, "grey")
 ```
 
-## 🎨 Available Themes
+## Available Themes
 You can change the entire look of the UI by passing one of these theme names:
 * `"black"` (OLED Dark)
 * `"grey"` (Sleek Graphite)
@@ -28,7 +28,7 @@ You can change the entire look of the UI by passing one of these theme names:
 * `"orange"` (Orange Red)
 * `"yellow"` (Bright Yellow)
 
-## 🏷️ Adding a Footer
+## Adding a Footer
 Add a sleek watermark or credit to the bottom of the UI. Uses Smart Arguments (Text, IconID, Shape).
 ```lua
 Window:SetFooter("yt: oxireun", 128337196312757, 2)
