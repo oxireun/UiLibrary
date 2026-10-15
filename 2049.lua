@@ -178,7 +178,6 @@ function OxireunUI:SendNotification(title, text, duration, ...)
         NotifContainer.Parent = targetGui
     end
 
-    -- BİLDİRİM ANINDA EKRANA GELİR, RESMİ BEKLEMEK İÇİN ASLA DURAKLAMAZ!
     task.spawn(function()
         local img
         if icon then
@@ -188,7 +187,8 @@ function OxireunUI:SendNotification(title, text, duration, ...)
             img.BackgroundTransparency = 1
             img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
             img.ImageTransparency = 1
-            img.ScaleType = Enum.ScaleType.Fit
+            img.ScaleType = Enum.ScaleType.Crop
+            img.ClipsDescendants = true
             
             if shape == 2 then
                 local icorner = inst("UICorner")
