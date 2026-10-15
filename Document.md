@@ -3,7 +3,7 @@
 
 ## Booting the Library
 ```lua
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/2049.lua"))()
 ```
 
 ## Creating a Window
@@ -87,7 +87,7 @@ Here is a complete, working example using all the features of the Oxireun UI Lib
 
 if game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end -- Prevents duplicate UIs
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/V1.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/2049.lua"))()
 
 local Window = Library:NewWindow(
     "Oxireun Script", -- Window Title
