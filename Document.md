@@ -147,7 +147,7 @@ CreditsSection:CreateButton("Copy YouTube", function()
         "Copied!",                           -- Title
         "YouTube link copied to clipboard!", -- Message
         3,                                   -- Duration (Seconds)
-        12345,                              -- Icon ID
+        108320733835485,                              -- Icon ID
         2                                    -- Shape (1 = Round, 2 = Square)
     )
 end)
@@ -159,7 +159,7 @@ CreditsSection:CreateButton("Copy Discord", function()
         "Copied!",                             -- Title
         "Discord invite copied to clipboard!", -- Message
         3,                                     -- Duration (Seconds)
-        12345,                                -- Icon ID
+        119731774091515,                                -- Icon ID
         2                                      -- Shape (1 = Round, 2 = Square)
     )
 end)
