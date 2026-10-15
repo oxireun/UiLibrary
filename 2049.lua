@@ -102,8 +102,11 @@ local ELEMENT_SIZES = {
     ToggleHeight = 32, TextboxHeight = 32, DropdownHeight = 32, SectionSpacing = 6
 }
 
+OxireunUI.IconsToPreload = {}
+
 local function parseSmartArgs(...)
     local id, shape, theme
+    local strings = {}
     for _, arg in ipairs({...}) do
         if type(arg) == "number" then
             if arg == 1 or arg == 2 then shape = arg
@@ -117,10 +120,31 @@ local function parseSmartArgs(...)
                 elseif num > 999 then id = num end
             elseif arg:match("rbxassetid") or arg:match("rbxthumb") then
                 id = arg
+            else
+                table.insert(strings, arg)
             end
         end
     end
-    return id, shape, theme
+    
+    local loadText = "Loading..."
+    local title = "Oxireun UI"
+    
+    if #strings == 1 then
+        loadText = strings[1]
+        title = strings[1]
+    elseif #strings >= 2 then
+        loadText = strings[1]
+        title = strings[2]
+    end
+    
+    return loadText, title, id, shape, theme
+end
+
+function OxireunUI:PreloadIcons(icons)
+    if type(icons) ~= "table" then icons = {icons} end
+    for _, id in pairs(icons) do
+        table.insert(self.IconsToPreload, id)
+    end
 end
 
 function OxireunUI:SendNotification(title, text, duration, ...)
@@ -174,134 +198,137 @@ function OxireunUI:SendNotification(title, text, duration, ...)
         NotifContainer.Parent = targetGui
     end
 
-    local img
-    if icon then
-        img = inst("ImageLabel")
-        img.Size = ud2(0, 30, 0, 30)
-        img.Position = ud2(0, 10, 0, 12)
-        img.BackgroundTransparency = 1
-        img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
-        img.ImageTransparency = 1
-        img.ScaleType = Enum.ScaleType.Fit
-        
-        if shape == 2 then
-            local icorner = inst("UICorner")
-            icorner.CornerRadius = ud(0, 6)
-            icorner.Parent = img
-        else
-            local icorner = inst("UICorner")
-            icorner.CornerRadius = ud(1, 0)
-            icorner.Parent = img
+    task.spawn(function()
+        local img
+        if icon then
+            img = inst("ImageLabel")
+            img.Size = ud2(0, 30, 0, 30)
+            img.Position = ud2(0, 10, 0, 12)
+            img.BackgroundTransparency = 1
+            img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
+            img.ImageTransparency = 1
+            img.ScaleType = Enum.ScaleType.Crop
+            img.ClipsDescendants = true
+            
+            if shape == 2 then
+                local icorner = inst("UICorner")
+                icorner.CornerRadius = ud(0, 6)
+                icorner.Parent = img
+            else
+                local icorner = inst("UICorner")
+                icorner.CornerRadius = ud(1, 0)
+                icorner.Parent = img
+            end
         end
-    end
 
-    local textOffset = icon and 50 or 10
-    local availableWidth = 250 - textOffset - 15
-    local bounds = txtSvc:GetTextSize(text or "Message", 12, Fonts.Normal, v2(availableWidth, 9000))
-    local textHeight = math.clamp(bounds.Y, 20, 400)
-    local frameHeight = math.max(60, 26 + textHeight + 20)
+        local textOffset = icon and 50 or 10
+        local availableWidth = 250 - textOffset - 15
+        local bounds = txtSvc:GetTextSize(text or "Message", 12, Fonts.Normal, v2(availableWidth, 9000))
+        local textHeight = math.clamp(bounds.Y, 20, 400)
+        local frameHeight = math.max(60, 26 + textHeight + 20)
 
-    local NotifFrame = inst("Frame")
-    NotifFrame.Size = ud2(1, 0, 0, frameHeight)
-    NotifFrame.BackgroundColor3 = c3(255, 255, 255)
-    NotifFrame.BorderSizePixel = 0
-    NotifFrame.BackgroundTransparency = 1
-    
-    local corner = inst("UICorner")
-    corner.CornerRadius = ud(0, 8)
-    corner.Parent = NotifFrame
-    
-    local notifGrad = inst("UIGradient")
-    notifGrad.Color = cseq({csk(0, nCol.Hover), csk(1, nCol.Background)})
-    notifGrad.Rotation = 90
-    notifGrad.Parent = NotifFrame
-    
-    local stroke = inst("UIStroke")
-    stroke.Color = c3(255, 255, 255)
-    stroke.Thickness = 1.5
-    stroke.Transparency = 1
-    stroke.Parent = NotifFrame
+        local NotifFrame = inst("Frame")
+        NotifFrame.Size = ud2(1, 0, 0, frameHeight)
+        NotifFrame.BackgroundColor3 = c3(255, 255, 255)
+        NotifFrame.BorderSizePixel = 0
+        NotifFrame.BackgroundTransparency = 1
+        
+        local corner = inst("UICorner")
+        corner.CornerRadius = ud(0, 8)
+        corner.Parent = NotifFrame
+        
+        local notifGrad = inst("UIGradient")
+        notifGrad.Color = cseq({csk(0, nCol.Hover), csk(1, nCol.Background)})
+        notifGrad.Rotation = 90
+        notifGrad.Parent = NotifFrame
+        
+        local stroke = inst("UIStroke")
+        stroke.Color = c3(255, 255, 255)
+        stroke.Thickness = 1.5
+        stroke.Transparency = 1
+        stroke.Parent = NotifFrame
 
-    local strokeGrad = inst("UIGradient")
-    strokeGrad.Color = cseq({csk(0, nCol.Accent), csk(1, nCol.Border)})
-    strokeGrad.Rotation = 45
-    strokeGrad.Parent = stroke
+        local strokeGrad = inst("UIGradient")
+        strokeGrad.Color = cseq({csk(0, nCol.Accent), csk(1, nCol.Border)})
+        strokeGrad.Rotation = 45
+        strokeGrad.Parent = stroke
 
-    if img then img.Parent = NotifFrame end
-    
-    local TitleLabel = inst("TextLabel")
-    TitleLabel.Size = ud2(1, -textOffset - 10, 0, 20)
-    TitleLabel.Position = ud2(0, textOffset, 0, 6)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Text = title or "Notification"
-    TitleLabel.TextColor3 = nCol.Text
-    TitleLabel.TextSize = 14
-    TitleLabel.Font = Fonts.Bold
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.TextTransparency = 1
-    TitleLabel.TextScaled = true
-    TitleLabel.TextWrapped = true
-    local nTitleConst = inst("UITextSizeConstraint")
-    nTitleConst.MaxTextSize = 14
-    nTitleConst.MinTextSize = 9
-    nTitleConst.Parent = TitleLabel
-    TitleLabel.Parent = NotifFrame
-    
-    local TextLabel = inst("TextLabel")
-    TextLabel.Size = ud2(1, -textOffset - 10, 0, textHeight)
-    TextLabel.Position = ud2(0, textOffset, 0, 26)
-    TextLabel.BackgroundTransparency = 1 
-    TextLabel.Text = text or "Message"
-    TextLabel.TextColor3 = nCol.TextInactive
-    TextLabel.TextSize = 12
-    TextLabel.Font = Fonts.Normal
-    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TextLabel.TextTransparency = 1
-    TextLabel.TextWrapped = true
-    TextLabel.Parent = NotifFrame
+        if img then img.Parent = NotifFrame end
+        
+        local TitleLabel = inst("TextLabel")
+        TitleLabel.Size = ud2(1, -textOffset - 10, 0, 20)
+        TitleLabel.Position = ud2(0, textOffset, 0, 6)
+        TitleLabel.BackgroundTransparency = 1
+        TitleLabel.Text = title or "Notification"
+        TitleLabel.TextColor3 = nCol.Text
+        TitleLabel.TextSize = 14
+        TitleLabel.Font = Fonts.Bold
+        TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        TitleLabel.TextTransparency = 1
+        TitleLabel.TextScaled = true
+        TitleLabel.TextWrapped = true
+        local nTitleConst = inst("UITextSizeConstraint")
+        nTitleConst.MaxTextSize = 14
+        nTitleConst.MinTextSize = 9
+        nTitleConst.Parent = TitleLabel
+        TitleLabel.Parent = NotifFrame
+        
+        local TextLabel = inst("TextLabel")
+        TextLabel.Size = ud2(1, -textOffset - 10, 0, textHeight)
+        TextLabel.Position = ud2(0, textOffset, 0, 26)
+        TextLabel.BackgroundTransparency = 1 
+        TextLabel.Text = text or "Message"
+        TextLabel.TextColor3 = nCol.TextInactive
+        TextLabel.TextSize = 12
+        TextLabel.Font = Fonts.Normal
+        TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+        TextLabel.TextTransparency = 1
+        TextLabel.TextWrapped = true
+        TextLabel.Parent = NotifFrame
 
-    local BarBg = inst("Frame")
-    BarBg.Size = ud2(1, -20, 0, 4)
-    BarBg.Position = ud2(0, 10, 1, -10)
-    BarBg.BackgroundColor3 = nCol.SecondaryBg
-    BarBg.BorderSizePixel = 0
-    BarBg.BackgroundTransparency = 1
-    inst("UICorner", BarBg).CornerRadius = ud(1, 0)
-    BarBg.Parent = NotifFrame
+        local BarBg = inst("Frame")
+        BarBg.Size = ud2(1, -20, 0, 4)
+        BarBg.Position = ud2(0, 10, 1, -10)
+        BarBg.BackgroundColor3 = nCol.SecondaryBg
+        BarBg.BorderSizePixel = 0
+        BarBg.BackgroundTransparency = 1
+        inst("UICorner", BarBg).CornerRadius = ud(1, 0)
+        BarBg.Parent = NotifFrame
 
-    local Bar = inst("Frame")
-    Bar.Size = ud2(1, 0, 1, 0)
-    Bar.BackgroundColor3 = c3(255, 255, 255)
-    Bar.BorderSizePixel = 0
-    Bar.BackgroundTransparency = 1
-    inst("UICorner", Bar).CornerRadius = ud(1, 0)
-    
-    local barGrad = inst("UIGradient")
-    barGrad.Color = cseq({csk(0, nCol.Slider), csk(1, nCol.Border)})
-    barGrad.Parent = Bar
-    Bar.Parent = BarBg
+        local Bar = inst("Frame")
+        Bar.Size = ud2(1, 0, 1, 0)
+        Bar.BackgroundColor3 = c3(255, 255, 255)
+        Bar.BorderSizePixel = 0
+        Bar.BackgroundTransparency = 1
+        inst("UICorner", Bar).CornerRadius = ud(1, 0)
+        
+        local barGrad = inst("UIGradient")
+        barGrad.Color = cseq({csk(0, nCol.Slider), csk(1, nCol.Border)})
+        barGrad.Parent = Bar
+        Bar.Parent = BarBg
 
-    NotifFrame.Parent = NotifContainer
-    ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 0}):Play()
-    ts:Create(stroke, ti(0.3), {Transparency = 0}):Play()
-    ts:Create(TitleLabel, ti(0.3), {TextTransparency = 0}):Play()
-    ts:Create(TextLabel, ti(0.3), {TextTransparency = 0}):Play()
-    ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 0.4}):Play()
-    ts:Create(Bar, ti(0.3), {BackgroundTransparency = 0}):Play()
-    if img then ts:Create(img, ti(0.3), {ImageTransparency = 0}):Play() end
-    
-    task.delay(0.3, function() ts:Create(Bar, ti(duration, Enum.EasingStyle.Linear), {Size = ud2(0, 0, 1, 0)}):Play() end)
-    
-    task.delay(duration + 0.3, function()
-        ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 1}):Play()
-        ts:Create(stroke, ti(0.3), {Transparency = 1}):Play()
-        ts:Create(TitleLabel, ti(0.3), {TextTransparency = 1}):Play()
-        ts:Create(TextLabel, ti(0.3), {TextTransparency = 1}):Play()
-        ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 1}):Play()
-        ts:Create(Bar, ti(0.3), {BackgroundTransparency = 1}):Play()
-        if img then ts:Create(img, ti(0.3), {ImageTransparency = 1}):Play() end
-        task.wait(0.3)
-        NotifFrame:Destroy()
+        NotifFrame.Parent = NotifContainer
+        ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 0}):Play()
+        ts:Create(stroke, ti(0.3), {Transparency = 0}):Play()
+        ts:Create(TitleLabel, ti(0.3), {TextTransparency = 0}):Play()
+        ts:Create(TextLabel, ti(0.3), {TextTransparency = 0}):Play()
+        ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 0.4}):Play()
+        ts:Create(Bar, ti(0.3), {BackgroundTransparency = 0}):Play()
+        if img then ts:Create(img, ti(0.3), {ImageTransparency = 0}):Play() end
+        
+        task.delay(0.3, function() ts:Create(Bar, ti(duration, Enum.EasingStyle.Linear), {Size = ud2(0, 0, 1, 0)}):Play() end)
+        
+        task.delay(duration + 0.3, function()
+            ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 1}):Play()
+            ts:Create(stroke, ti(0.3), {Transparency = 1}):Play()
+            ts:Create(TitleLabel, ti(0.3), {TextTransparency = 1}):Play()
+            ts:Create(TextLabel, ti(0.3), {TextTransparency = 1}):Play()
+            ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 1}):Play()
+            ts:Create(Bar, ti(0.3), {BackgroundTransparency = 1}):Play()
+            if img then ts:Create(img, ti(0.3), {ImageTransparency = 1}):Play() end
+            task.wait(0.3)
+            NotifFrame:Destroy()
+        end)
     end)
 end
 
@@ -311,8 +338,8 @@ function OxireunUI.new()
     return self
 end
 
-function OxireunUI:NewWindow(title, ...)
-    local logoId, shape, themeName = parseSmartArgs(...)
+function OxireunUI:NewWindow(...)
+    local loadText, title, logoId, shape, themeName = parseSmartArgs(...)
     
     if themeName then
         local t = Themes[themeName]
@@ -336,8 +363,64 @@ function OxireunUI:NewWindow(title, ...)
         end
     end
 
-    local Window = {Title = title or "Oxireun UI", Sections = {}, CurrentSection = nil}
+    local Window = {Title = title, Sections = {}, CurrentSection = nil}
     
+    local LoadGui = inst("ScreenGui")
+    LoadGui.Name = genHash()
+    LoadGui.DisplayOrder = 999999
+    LoadGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    pcall(function() LoadGui.Parent = core end)
+    if not LoadGui.Parent and pg then LoadGui.Parent = pg end
+    
+    local LoadBg = inst("Frame")
+    LoadBg.Size = ud2(1, 0, 1, 0)
+    LoadBg.BackgroundColor3 = c3(5, 5, 5)
+    LoadBg.BackgroundTransparency = 1
+    LoadBg.Parent = LoadGui
+    
+    local LoadTextLbl = inst("TextLabel")
+    LoadTextLbl.Size = ud2(1, 0, 0, 50)
+    LoadTextLbl.Position = ud2(0, 0, 0.5, -35)
+    LoadTextLbl.BackgroundTransparency = 1
+    LoadTextLbl.Text = loadText
+    LoadTextLbl.TextColor3 = c3(200, 10, 10) 
+    LoadTextLbl.Font = Enum.Font.Bodoni
+    LoadTextLbl.TextSize = 36
+    LoadTextLbl.TextTransparency = 1
+    LoadTextLbl.Parent = LoadBg
+    
+    local LoadStroke = inst("UIStroke")
+    LoadStroke.Color = c3(0, 0, 0)
+    LoadStroke.Thickness = 1
+    LoadStroke.Transparency = 1
+    LoadStroke.Parent = LoadTextLbl
+    
+    local LoadBarBg = inst("Frame")
+    LoadBarBg.Size = ud2(0, 200, 0, 2)
+    LoadBarBg.Position = ud2(0.5, -100, 0.5, 25)
+    LoadBarBg.BackgroundColor3 = c3(20, 20, 20)
+    LoadBarBg.BorderSizePixel = 0
+    LoadBarBg.BackgroundTransparency = 1
+    LoadBarBg.Parent = LoadBg
+    
+    local LoadBar = inst("Frame")
+    LoadBar.Size = ud2(0, 0, 1, 0)
+    LoadBar.BackgroundColor3 = c3(200, 10, 10)
+    LoadBar.BorderSizePixel = 0
+    LoadBar.BackgroundTransparency = 1
+    LoadBar.Parent = LoadBarBg
+    
+    local blur = inst("BlurEffect")
+    blur.Size = 0
+    pcall(function() blur.Parent = game:GetService("Lighting") end)
+    
+    ts:Create(blur, ti(0.5), {Size = 24}):Play()
+    ts:Create(LoadBg, ti(0.5), {BackgroundTransparency = 0.2}):Play()
+    ts:Create(LoadTextLbl, ti(0.5), {TextTransparency = 0}):Play()
+    ts:Create(LoadStroke, ti(0.5), {Transparency = 0}):Play()
+    ts:Create(LoadBarBg, ti(0.5), {BackgroundTransparency = 0.5}):Play()
+    ts:Create(LoadBar, ti(0.5), {BackgroundTransparency = 0}):Play()
+
     local ScreenGui = inst("ScreenGui")
     ScreenGui.Name = genHash()
     ScreenGui:SetAttribute("OxMain", true) 
@@ -353,6 +436,7 @@ function OxireunUI:NewWindow(title, ...)
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
     MainFrame.Active = true
+    MainFrame.Visible = false 
     
     local mainGradient = inst("UIGradient")
     mainGradient.Color = cseq({
@@ -382,7 +466,7 @@ function OxireunUI:NewWindow(title, ...)
         FloatingLogo.Size = ud2(0, 46, 0, 46)
         FloatingLogo.Position = ud2(0, 20, 0.5, -23)
         FloatingLogo.BackgroundColor3 = Colors.Background
-        FloatingLogo.Visible = true
+        FloatingLogo.Visible = false 
         FloatingLogo.AutoButtonColor = false
         FloatingLogo.ClipsDescendants = true
         
@@ -414,26 +498,16 @@ function OxireunUI:NewWindow(title, ...)
         logoImg.Parent = FloatingLogo
         FloatingLogo.Parent = ScreenGui
         
-        task.spawn(function()
-            local tempImg = inst("ImageLabel")
-            tempImg.Image = logoImg.Image
-            tempImg.Visible = false
-            tempImg.Parent = ScreenGui
-            pcall(function() cp:PreloadAsync({tempImg}) end)
-            tempImg:Destroy()
-        end)
-        
         local isGuiOpen = true
         
-        task.spawn(function()
-            task.wait() 
-            if FloatingLogo and MainFrame then
+        local function updateGuiPos()
+            if isGuiOpen then
                 local lx, ly = FloatingLogo.AbsolutePosition.X, FloatingLogo.AbsolutePosition.Y
                 local lw, lh = FloatingLogo.AbsoluteSize.X, FloatingLogo.AbsoluteSize.Y
                 local targetY = ly + (lh / 2) - (UI_SIZE.Height / 2)
                 MainFrame.Position = ud2(0, lx + lw + 15, 0, targetY)
             end
-        end)
+        end
 
         local dragL = false
         local dragStartL, startPosL, hasMovedL
@@ -466,13 +540,17 @@ function OxireunUI:NewWindow(title, ...)
                 isGuiOpen = not isGuiOpen
                 MainFrame.Visible = isGuiOpen
                 
-                if not isGuiOpen then
+                if isGuiOpen then 
+                    if not guiHasBeenDragged then updateGuiPos() end
+                else
                     for drop, _ in pairs(activeDropdowns) do
                         if drop and drop.Parent then drop.Parent:Destroy(); activeDropdowns[drop] = nil end
                     end
                 end
             end
         end)
+        
+        task.defer(updateGuiPos)
     end
     
     local colorIndex = 1
@@ -672,9 +750,7 @@ function OxireunUI:NewWindow(title, ...)
             fCorner.Parent = img
             img.Parent = FooterFrame
             
-            task.spawn(function()
-                pcall(function() cp:PreloadAsync({img}) end)
-            end)
+            if icon then table.insert(OxireunUI.IconsToPreload, icon) end
         end
         
         local lbl = inst("TextLabel")
@@ -1243,6 +1319,47 @@ function OxireunUI:NewWindow(title, ...)
         table.insert(Window.Sections, Section)
         return Section
     end
+    
+    local assetsToLoad = {}
+    if logoId then
+        local lImg = inst("ImageLabel")
+        lImg.Image = tonumber(logoId) and "rbxthumb://type=Asset&id="..logoId.."&w=150&h=150" or logoId
+        table.insert(assetsToLoad, lImg)
+    end
+    for _, pid in pairs(OxireunUI.IconsToPreload) do
+        local pImg = inst("ImageLabel")
+        pImg.Image = tonumber(pid) and "rbxthumb://type=Asset&id="..pid.."&w=150&h=150" or pid
+        table.insert(assetsToLoad, pImg)
+    end
+
+    task.spawn(function()
+        ts:Create(LoadBar, ti(0.8, Enum.EasingStyle.Sine), {Size = ud2(0.6, 0, 1, 0)}):Play()
+        
+        if #assetsToLoad > 0 then
+            pcall(function() cp:PreloadAsync(assetsToLoad) end)
+        end
+        task.wait(0.5) 
+        
+        ts:Create(LoadBar, ti(0.3, Enum.EasingStyle.Sine), {Size = ud2(1, 0, 1, 0)}):Play()
+        task.wait(0.4)
+        
+        ts:Create(blur, ti(0.5), {Size = 0}):Play()
+        ts:Create(LoadBg, ti(0.5), {BackgroundTransparency = 1}):Play()
+        ts:Create(LoadTextLbl, ti(0.5), {TextTransparency = 1}):Play()
+        ts:Create(LoadStroke, ti(0.5), {Transparency = 1}):Play()
+        ts:Create(LoadBarBg, ti(0.5), {BackgroundTransparency = 1}):Play()
+        ts:Create(LoadBar, ti(0.5), {BackgroundTransparency = 1}):Play()
+        
+        task.wait(0.5)
+        LoadGui:Destroy()
+        if blur.Parent then blur:Destroy() end
+        
+        if logoId and FloatingLogo then
+            FloatingLogo.Visible = true
+        else
+            MainFrame.Visible = true
+        end
+    end)
     
     MainFrame.Parent = ScreenGui
     pcall(function() ScreenGui.Parent = core end)
