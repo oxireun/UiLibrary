@@ -105,6 +105,7 @@ local ELEMENT_SIZES = {
     ToggleHeight = 32, TextboxHeight = 32, DropdownHeight = 32, SectionSpacing = 6
 }
 
+-- AKILLI PARAMETRE AYIRICI
 local function parseSmartArgs(...)
     local id, shape, theme
     for _, arg in ipairs({...}) do
@@ -177,25 +178,17 @@ function OxireunUI:SendNotification(title, text, duration, ...)
         NotifContainer.Parent = targetGui
     end
 
+    -- BİLDİRİM ANINDA EKRANA GELİR, RESMİ BEKLEMEK İÇİN ASLA DURAKLAMAZ!
     task.spawn(function()
         local img
         if icon then
-            local tempImg = inst("ImageLabel")
-            tempImg.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
-            tempImg.Visible = false
-            tempImg.Parent = targetGui
-            pcall(function() cp:PreloadAsync({tempImg}) end)
-            tempImg:Destroy()
-
             img = inst("ImageLabel")
             img.Size = ud2(0, 30, 0, 30)
             img.Position = ud2(0, 10, 0, 12)
             img.BackgroundTransparency = 1
             img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
             img.ImageTransparency = 1
-            -- TAŞMA VE DAL GİBİ ÇIKMAYI %100 ÖNLER (Crop Kesici Modu)
-            img.ScaleType = Enum.ScaleType.Crop
-            img.ClipsDescendants = true
+            img.ScaleType = Enum.ScaleType.Fit
             
             if shape == 2 then
                 local icorner = inst("UICorner")
@@ -418,11 +411,9 @@ function OxireunUI:NewWindow(title, ...)
         logoImg.Position = ud2(0, 0, 0, 0)
         logoImg.BackgroundTransparency = 1
         logoImg.Image = tonumber(logoId) and "rbxthumb://type=Asset&id="..logoId.."&w=150&h=150" or logoId
-        -- TAŞMA VE DAL GİBİ ÇIKMAYI %100 ÖNLER (Crop Kesici Modu)
         logoImg.ScaleType = Enum.ScaleType.Crop 
         logoImg.ClipsDescendants = true
         
-        -- MÜHÜRLEME: Resmi tamamen içeri hapseden ekstra güvenlik köşesi
         local innerCorner = inst("UICorner")
         innerCorner.CornerRadius = shape == 2 and ud(0, 6) or ud(1, 0)
         innerCorner.Parent = logoImg
@@ -674,16 +665,13 @@ function OxireunUI:NewWindow(title, ...)
         
         local tOff = 8
         if icon then
-            tOff = 24
+            tOff = 20
             local img = inst("ImageLabel")
             img.Size = ud2(0, 12, 0, 12)
             img.Position = ud2(0, 4, 0.5, -6)
             img.BackgroundTransparency = 1
             img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
-            -- TAŞMA VE DAL GİBİ ÇIKMAYI %100 ÖNLER (Crop Kesici Modu)
-            img.ScaleType = Enum.ScaleType.Crop
-            img.ClipsDescendants = true
-            
+            img.ScaleType = Enum.ScaleType.Fit
             inst("UICorner", img).CornerRadius = shape == 2 and ud(0,4) or ud(1,0)
             img.Parent = FooterFrame
             task.spawn(function() pcall(function() cp:PreloadAsync({img}) end) end)
