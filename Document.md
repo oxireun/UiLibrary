@@ -91,14 +91,14 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxire
 
 local Window = Library:NewWindow(
     "Oxireun Script", -- Window Title
-    12345,           -- Floating Logo ID
+    128337196312757,           -- Floating Logo ID
     2,                -- Shape (1 = Round, 2 = Square)
     "grey"            -- Theme Color
 )
 
 Window:SetFooter(
     "yt: oxireun", -- Footer Text
-    12345,        -- Footer Icon ID
+    128337196312757,        -- Footer Icon ID
     2              -- Shape (1 = Round, 2 = Square)
 )
 
@@ -112,7 +112,7 @@ MainSection:CreateButton("Test Notification", function()
         "Hello!",                         -- Title
         "This is a custom notification.", -- Message
         3,                                -- Duration (Seconds)
-        12345,                           -- Icon ID
+        128337196312757,                           -- Icon ID
         2                                 -- Shape (1 = Round, 2 = Square)
     )
 end)
