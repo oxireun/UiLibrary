@@ -15,7 +15,7 @@ We use **Smart Arguments**. You don't need to memorize the order! Just pass what
 * available colors`black` `grey` `red` `blue` `green` `pink` `orange` `yellow`
 
 ```lua
-local Window = Library:NewWindow("Oxireun Script", 128337196312757, 2, "grey")
+local Window = Library:NewWindow("Oxireun Script", 128337196312757, 1, "orange")
 ```
 
 * 
