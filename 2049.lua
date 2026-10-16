@@ -13,6 +13,8 @@ local function genHash()
     return hs:GenerateGUID(false):gsub("-", "")
 end
 
+OxireunUI.PreloadQueue = {}
+
 local Colors = {
     Background = c3(15, 12, 22), SecondaryBg = c3(10, 8, 15), SectionBg = c3(15, 12, 22),
     Border = c3(120, 40, 220), Accent = c3(100, 30, 150), Text = c3(255, 255, 255),
@@ -102,171 +104,193 @@ local ELEMENT_SIZES = {
     ToggleHeight = 32, TextboxHeight = 32, DropdownHeight = 32, SectionSpacing = 6
 }
 
+function OxireunUI:PreloadIcons(icons)
+    if type(icons) ~= "table" then icons = {icons} end
+    for _, id in pairs(icons) do
+        table.insert(self.PreloadQueue, id)
+    end
+end
+
 function OxireunUI:LoadingScreen(tText)
-    task.spawn(function()
-        local lg = game:GetService("Lighting")
-        local pg = lplr:WaitForChild("PlayerGui")
-        tText = tText or "DEXTER"
-        
-        for _,v in ipairs({pg:FindFirstChild("DexterLoading"),lg:FindFirstChild("DexterBlur"),lg:FindFirstChild("DexterCC")}) do 
-            if v then v:Destroy() end 
-        end
-        
-        local function n(c,p,t)
-            local o=inst(c)
-            for k,v in pairs(t or {}) do o[k]=v end
-            o.Parent=p
-            return o
-        end
-        
-        local function corner(o) n("UICorner",o,{CornerRadius=ud(1,0)}) end
-        
-        local function tw(o,d,p,s,e)
-            local x=ts:Create(o,ti(d,s or Enum.EasingStyle.Quad,e or Enum.EasingDirection.Out),p)
-            x:Play()
-            return x
-        end
-        
-        local blur=n("BlurEffect",lg,{Name="DexterBlur",Size=0})
-        local cc=n("ColorCorrectionEffect",lg,{Name="DexterCC",TintColor=c3(255,230,230),Contrast=.2})
-        local gui=n("ScreenGui",pg,{Name="DexterLoading",IgnoreGuiInset=true,ResetOnSpawn=false,DisplayOrder=9999})
-        local bg=n("Frame",gui,{Size=ud2(1,0,1,0),BackgroundColor3=c3(4,1,2),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=1})
-        local vig=n("ImageLabel",bg,{Size=ud2(1,0,1,0),BackgroundTransparency=1,Image="rbxassetid://4576475446",ImageColor3=c3(115,0,0),ImageTransparency=1,ZIndex=2})
-        local hub=n("Frame",gui,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,.5,0),Size=ud2(.75,0,.5,0),BackgroundTransparency=1,ZIndex=3})
-        local scale=n("UIScale",hub,{Scale=1})
-        local holder=n("Frame",hub,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,.32,0),Size=ud2(.85,0,.36,0),BackgroundTransparency=1,ZIndex=4})
-        local shadow=n("TextLabel",holder,{Size=ud2(1,0,1,0),Position=ud2(0,3,0,4),BackgroundTransparency=1,Font=Enum.Font.Bodoni,Text=tText,TextColor3=c3(22,0,0),TextScaled=true,TextTransparency=1,ZIndex=5})
-        local title=n("TextLabel",holder,{Size=ud2(1,0,1,0),BackgroundTransparency=1,Font=Enum.Font.Bodoni,Text=tText,TextColor3=c3(195,10,10),TextScaled=true,TextTransparency=1,ZIndex=6})
-        n("UIGradient",title,{Rotation=90,Color=cseq({csk(0,c3(255,65,65)),csk(.5,c3(165,0,0)),csk(1,c3(60,0,0))})})
-        local shine=n("TextLabel",holder,{Size=ud2(1,0,1,0),BackgroundTransparency=1,Font=Enum.Font.Bodoni,Text=tText,TextColor3=c3(255,235,235),TextScaled=true,TextTransparency=1,ZIndex=7})
-        local sg=n("UIGradient",shine,{Color=cseq(c3(1,1,1)),Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(.38,1),NumberSequenceKeypoint.new(.5,.15),NumberSequenceKeypoint.new(.62,1),NumberSequenceKeypoint.new(1,1)}),Offset=v2(-1,0)})
-        local BW,BY=.65,.72
-        local bar=n("Frame",hub,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,BY,0),Size=ud2(BW,0,0,6),BackgroundColor3=c3(12,1,2),BorderSizePixel=0,BackgroundTransparency=1,ZIndex=5})
-        corner(bar)
-        local stroke=n("UIStroke",bar,{Color=c3(75,5,10),Thickness=1,Transparency=1})
-        local fill=n("Frame",bar,{Size=ud2(0,0,1,0),BackgroundColor3=c3(180,0,0),BorderSizePixel=0,BackgroundTransparency=1,ZIndex=6})
-        corner(fill)
-        n("UIGradient",fill,{Color=cseq({csk(0,c3(80,0,0)),csk(.7,c3(175,0,0)),csk(1,c3(240,20,20))})})
-        local pct=n("TextLabel",hub,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,.84,0),Size=ud2(1,0,.08,0),BackgroundTransparency=1,Font=Enum.Font.GothamMedium,Text="0%",TextColor3=c3(180,100,100),TextSize=13,TextTransparency=1,ZIndex=5})
-        local blood=n("Frame",hub,{Size=ud2(1,0,1,0),BackgroundTransparency=1,ZIndex=8})
-        local exiting=false
-        
-        local function textX(r)
-            local w=((title.TextBounds.X>0 and title.TextBounds.X/hub.AbsoluteSize.X) or math.clamp(#tText*.05,.2,.7))*.85
-            return .5-w/2+w*r
-        end
-        local function textBlood(x)
-            if exiting or not gui.Parent then return end
-            local y=.46
-            local drop=n("Frame",blood,{AnchorPoint=v2(.5,0),Position=ud2(x,0,y,0),Size=ud2(0,0,0,0),BackgroundColor3=c3(135,0,0),BorderSizePixel=0,ZIndex=8})
-            corner(drop)
-            tw(drop,1.3,{Size=ud2(0,5,0,6)},Enum.EasingStyle.Sine)
-            task.delay(1.3,function()
+    local lg = game:GetService("Lighting")
+    local pg = lplr:WaitForChild("PlayerGui")
+    tText = tText or "DEXTER"
+    
+    for _,v in ipairs({pg:FindFirstChild("DexterLoading"),lg:FindFirstChild("DexterBlur"),lg:FindFirstChild("DexterCC")}) do 
+        if v then v:Destroy() end 
+    end
+    
+    local function n(c,p,t)
+        local o=inst(c)
+        for k,v in pairs(t or {}) do o[k]=v end
+        o.Parent=p
+        return o
+    end
+    
+    local function corner(o) n("UICorner",o,{CornerRadius=ud(1,0)}) end
+    
+    local function tw(o,d,p,s,e)
+        local x=ts:Create(o,ti(d,s or Enum.EasingStyle.Quad,e or Enum.EasingDirection.Out),p)
+        x:Play()
+        return x
+    end
+    
+    local blur=n("BlurEffect",lg,{Name="DexterBlur",Size=0})
+    local cc=n("ColorCorrectionEffect",lg,{Name="DexterCC",TintColor=c3(255,230,230),Contrast=.2})
+    local gui=n("ScreenGui",pg,{Name="DexterLoading",IgnoreGuiInset=true,ResetOnSpawn=false,DisplayOrder=10})
+    local bg=n("Frame",gui,{Size=ud2(1,0,1,0),BackgroundColor3=c3(4,1,2),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=1})
+    local vig=n("ImageLabel",bg,{Size=ud2(1,0,1,0),BackgroundTransparency=1,Image="rbxassetid://4576475446",ImageColor3=c3(115,0,0),ImageTransparency=1,ZIndex=2})
+    local hub=n("Frame",gui,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,.5,0),Size=ud2(.75,0,.5,0),BackgroundTransparency=1,ZIndex=3})
+    local scale=n("UIScale",hub,{Scale=1})
+    local holder=n("Frame",hub,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,.32,0),Size=ud2(.85,0,.36,0),BackgroundTransparency=1,ZIndex=4})
+    local shadow=n("TextLabel",holder,{Size=ud2(1,0,1,0),Position=ud2(0,3,0,4),BackgroundTransparency=1,Font=Enum.Font.Bodoni,Text=tText,TextColor3=c3(22,0,0),TextScaled=true,TextTransparency=1,ZIndex=5})
+    local title=n("TextLabel",holder,{Size=ud2(1,0,1,0),BackgroundTransparency=1,Font=Enum.Font.Bodoni,Text=tText,TextColor3=c3(195,10,10),TextScaled=true,TextTransparency=1,ZIndex=6})
+    n("UIGradient",title,{Rotation=90,Color=cseq({csk(0,c3(255,65,65)),csk(.5,c3(165,0,0)),csk(1,c3(60,0,0))})})
+    local shine=n("TextLabel",holder,{Size=ud2(1,0,1,0),BackgroundTransparency=1,Font=Enum.Font.Bodoni,Text=tText,TextColor3=c3(255,255,255),TextScaled=true,TextTransparency=1,ZIndex=7})
+    local sg=n("UIGradient",shine,{Color=cseq(c3(255,255,255)),Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(.38,1),NumberSequenceKeypoint.new(.5,.15),NumberSequenceKeypoint.new(.62,1),NumberSequenceKeypoint.new(1,1)}),Offset=v2(-1,0)})
+    local BW,BY=.65,.72
+    local bar=n("Frame",hub,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,BY,0),Size=ud2(BW,0,0,6),BackgroundColor3=c3(12,1,2),BorderSizePixel=0,BackgroundTransparency=1,ZIndex=5})
+    corner(bar)
+    local stroke=n("UIStroke",bar,{Color=c3(75,5,10),Thickness=1,Transparency=1})
+    local fill=n("Frame",bar,{Size=ud2(0,0,1,0),BackgroundColor3=c3(180,0,0),BorderSizePixel=0,BackgroundTransparency=1,ZIndex=6})
+    corner(fill)
+    n("UIGradient",fill,{Color=cseq({csk(0,c3(80,0,0)),csk(.7,c3(175,0,0)),csk(1,c3(240,20,20))})})
+    local pct=n("TextLabel",hub,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,.84,0),Size=ud2(1,0,.08,0),BackgroundTransparency=1,Font=Enum.Font.GothamMedium,Text="0%",TextColor3=c3(180,100,100),TextSize=13,TextTransparency=1,ZIndex=5})
+    local blood=n("Frame",hub,{Size=ud2(1,0,1,0),BackgroundTransparency=1,ZIndex=8})
+    local exiting=false
+    
+    local function textX(r)
+        local w=((title.TextBounds.X>0 and title.TextBounds.X/hub.AbsoluteSize.X) or math.clamp(#tText*.05,.2,.7))*.85
+        return .5-w/2+w*r
+    end
+    local function textBlood(x)
+        if exiting or not gui.Parent then return end
+        local y=.46
+        local drop=n("Frame",blood,{AnchorPoint=v2(.5,0),Position=ud2(x,0,y,0),Size=ud2(0,0,0,0),BackgroundColor3=c3(135,0,0),BorderSizePixel=0,ZIndex=8})
+        corner(drop)
+        tw(drop,1.3,{Size=ud2(0,5,0,6)},Enum.EasingStyle.Sine)
+        task.delay(1.3,function()
+            if exiting or not drop.Parent then return end
+            local len=math.random(25,48)
+            local stream=n("Frame",blood,{AnchorPoint=v2(.5,0),Position=ud2(x,0,y+.005,0),Size=ud2(0,2,0,0),BackgroundColor3=c3(115,0,0),BorderSizePixel=0,ZIndex=8})
+            corner(stream)
+            tw(stream,1.8,{Size=ud2(0,2,0,len)},Enum.EasingStyle.Quad)
+            tw(drop,1.8,{Position=ud2(x,0,y+.005,len)},Enum.EasingStyle.Quad)
+            task.delay(1.8,function()
                 if exiting or not drop.Parent then return end
-                local len=math.random(25,48)
-                local stream=n("Frame",blood,{AnchorPoint=v2(.5,0),Position=ud2(x,0,y+.005,0),Size=ud2(0,2,0,0),BackgroundColor3=c3(115,0,0),BorderSizePixel=0,ZIndex=8})
-                corner(stream)
-                tw(stream,1.8,{Size=ud2(0,2,0,len)},Enum.EasingStyle.Quad)
-                tw(drop,1.8,{Position=ud2(x,0,y+.005,len)},Enum.EasingStyle.Quad)
-                task.delay(1.8,function()
-                    if exiting or not drop.Parent then return end
-                    tw(drop,2.4,{Position=ud2(x,0,y+.005,len+math.random(55,95)),BackgroundTransparency=.3},Enum.EasingStyle.Quad,Enum.EasingDirection.In)
+                tw(drop,2.4,{Position=ud2(x,0,y+.005,len+math.random(55,95)),BackgroundTransparency=.3},Enum.EasingStyle.Quad,Enum.EasingDirection.In)
+            end)
+        end)
+    end
+    local function barBlood(x,y,len,speed)
+        if exiting or not gui.Parent then return end
+        local w=math.random(2,3)
+        local stream=n("Frame",blood,{AnchorPoint=v2(.5,0),Position=ud2(x,0,y,0),Size=ud2(0,w,0,0),BackgroundColor3=c3(120,0,0),BorderSizePixel=0,ZIndex=8})
+        corner(stream)
+        tw(stream,speed,{Size=ud2(0,w,0,len)},Enum.EasingStyle.Sine)
+        task.delay(speed*.7,function()
+            if exiting or not stream.Parent then return end
+            local sz=math.random(4,6)
+            local drop=n("Frame",blood,{AnchorPoint=v2(.5,.5),Position=ud2(x,0,y,len),Size=ud2(0,sz,0,sz+3),BackgroundColor3=c3(145,0,0),BorderSizePixel=0,ZIndex=9})
+            corner(drop)
+            tw(drop,2.2,{Position=ud2(x,0,y,len+math.random(50,95)),BackgroundTransparency=.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In)
+        end)
+    end
+    local heartbeat=rs.RenderStepped:Connect(function()
+        vig.ImageTransparency=.45+(math.sin(tick()*3.2)+1)/2*.2
+    end)
+    tw(blur,.8,{Size=20})
+    tw(bg,.7,{BackgroundTransparency=.15})
+    task.wait(.35)
+    tw(title,.9,{TextTransparency=0},Enum.EasingStyle.Cubic)
+    tw(shadow,.9,{TextTransparency=.3},Enum.EasingStyle.Cubic)
+    tw(shine,.9,{TextTransparency=0},Enum.EasingStyle.Cubic)
+    task.wait(.4)
+    task.spawn(function()
+        while not exiting and gui.Parent do
+            sg.Offset=v2(-1,0)
+            tw(sg,4.8,{Offset=v2(1,0)},Enum.EasingStyle.Sine,Enum.EasingDirection.InOut).Completed:Wait()
+            task.wait(1.8)
+        end
+    end)
+    tw(bar,.5,{BackgroundTransparency=.2})
+    tw(stroke,.5,{Transparency=.3})
+    tw(fill,.5,{BackgroundTransparency=0})
+    tw(pct,.5,{TextTransparency=0})
+    
+    local totalAssets = #(OxireunUI.PreloadQueue or {})
+    local loadedAssets = 0
+    
+    if totalAssets > 0 then
+        task.spawn(function()
+            local imLabels = {}
+            for _, id in ipairs(OxireunUI.PreloadQueue) do
+                local im = inst("ImageLabel")
+                im.Image = tonumber(id) and "rbxthumb://type=Asset&id="..id.."&w=150&h=150" or id
+                table.insert(imLabels, im)
+            end
+            pcall(function()
+                cp:PreloadAsync(imLabels, function()
+                    loadedAssets = loadedAssets + 1
                 end)
             end)
-        end
-        local function barBlood(x,y,len,speed)
-            if exiting or not gui.Parent then return end
-            local w=math.random(2,3)
-            local stream=n("Frame",blood,{AnchorPoint=v2(.5,0),Position=ud2(x,0,y,0),Size=ud2(0,w,0,0),BackgroundColor3=c3(120,0,0),BorderSizePixel=0,ZIndex=8})
-            corner(stream)
-            tw(stream,speed,{Size=ud2(0,w,0,len)},Enum.EasingStyle.Sine)
-            task.delay(speed*.7,function()
-                if exiting or not stream.Parent then return end
-                local sz=math.random(4,6)
-                local drop=n("Frame",blood,{AnchorPoint=v2(.5,.5),Position=ud2(x,0,y,len),Size=ud2(0,sz,0,sz+3),BackgroundColor3=c3(145,0,0),BorderSizePixel=0,ZIndex=9})
-                corner(drop)
-                tw(drop,2.2,{Position=ud2(x,0,y,len+math.random(50,95)),BackgroundTransparency=.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In)
-            end)
-        end
-        local heartbeat=rs.RenderStepped:Connect(function()
-            vig.ImageTransparency=.45+(math.sin(tick()*3.2)+1)/2*.2
+            loadedAssets = totalAssets 
         end)
-        tw(blur,.8,{Size=20})
-        tw(bg,.7,{BackgroundTransparency=.15})
-        task.wait(.35)
-        tw(title,.9,{TextTransparency=0},Enum.EasingStyle.Cubic)
-        tw(shadow,.9,{TextTransparency=.3},Enum.EasingStyle.Cubic)
-        tw(shine,.9,{TextTransparency=0},Enum.EasingStyle.Cubic)
-        task.wait(.4)
-        task.spawn(function()
-            while not exiting and gui.Parent do
-                sg.Offset=v2(-1,0)
-                tw(sg,4.8,{Offset=v2(1,0)},Enum.EasingStyle.Sine,Enum.EasingDirection.InOut).Completed:Wait()
-                task.wait(1.8)
-            end
-        end)
-        tw(bar,.5,{BackgroundTransparency=.2})
-        tw(stroke,.5,{Transparency=.3})
-        tw(fill,.5,{BackgroundTransparency=0})
-        tw(pct,.5,{TextTransparency=0})
-        
-        local start=.5-BW/2
-        local currentP = 0
-        local timeElap = 0
-        local t18, t45, t72 = false, false, false
-        local stepCount = 0
+    else
+        loadedAssets = 1
+        totalAssets = 1
+    end
 
-        while currentP < 0.995 do
-            if not gui.Parent then break end
-            
-            local pending = cp.RequestQueueSize
-            local targetP = (pending == 0) and 1 or 0.9
-            local artP = math.min(targetP, timeElap / 3.0) 
-            
-            currentP = currentP + (artP - currentP) * 0.15
-            if currentP > 0.99 and pending == 0 then currentP = 1 end
-            
-            tw(fill,.06,{Size=ud2(currentP,0,1,0)},Enum.EasingStyle.Linear)
-            pct.Text=math.floor(currentP*100).."%"
-            
-            local idx = math.floor(currentP*100)
-            if stepCount%7==0 and currentP>.05 then barBlood(start+BW*currentP,BY+.012,math.random(18,38),math.random(20,32)/10) end
-            if idx>=18 and not t18 then t18=true; textBlood(textX(.25)) end
-            if idx>=45 and not t45 then t45=true; textBlood(textX(.5)) end
-            if idx>=72 and not t72 then t72=true; textBlood(textX(.75)) end
-            
-            task.wait(0.05)
-            timeElap = timeElap + 0.05
-            stepCount = stepCount + 1
-            if currentP >= 1 and pending == 0 then break end
-        end
+    local start=.5-BW/2
+    local currentP = 0
+    local timeElap = 0
+    local t18, t45, t72 = false, false, false
+    local stepCount = 0
 
-        exiting=true
-        heartbeat:Disconnect()
-        task.wait(.1)
+    while currentP < 0.995 do
+        if not gui.Parent then break end
         
-        local flash=n("Frame",gui,{Size=ud2(1,0,1,0),BackgroundColor3=c3(255,255,255),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=50})
-        tw(flash,.15,{BackgroundTransparency=0},Enum.EasingStyle.Linear)
-        task.wait(.18)
+        local pending = cp.RequestQueueSize
+        local targetP = (pending == 0) and 1 or 0.9
+        local artP = math.min(targetP, timeElap / 3.0) 
         
-        task.spawn(function()
-            local ex=1
-            local function fade(o,p) tw(o,ex,p,Enum.EasingStyle.Cubic) end
-            fade(flash,{BackgroundTransparency=1})
-            fade(scale,{Scale=1.06})
-            for _,o in ipairs({title,shadow,shine,pct}) do fade(o,{TextTransparency=1}) end
-            for _,o in ipairs({bar,fill}) do fade(o,{BackgroundTransparency=1}) end
-            fade(stroke,{Transparency=1})
-            for _,o in ipairs(blood:GetChildren()) do if o:IsA("Frame") then fade(o,{BackgroundTransparency=1}) end end
-            fade(vig,{ImageTransparency=1})
-            fade(bg,{BackgroundTransparency=1})
-            fade(blur,{Size=0})
-            fade(cc,{Contrast=0,TintColor=c3(1,1,1)})
-            task.wait(ex+.05)
-            gui:Destroy()
-            if blur then blur:Destroy() end
-            if cc then cc:Destroy() end
-        end)
+        currentP = currentP + (artP - currentP) * 0.15
+        if currentP > 0.99 and pending == 0 then currentP = 1 end
+        
+        tw(fill,.06,{Size=ud2(currentP,0,1,0)},Enum.EasingStyle.Linear)
+        pct.Text=math.floor(currentP*100).."%"
+        
+        local idx = math.floor(currentP*100)
+        if stepCount%7==0 and currentP>.05 then barBlood(start+BW*currentP,BY+.012,math.random(18,38),math.random(20,32)/10) end
+        if idx>=18 and not t18 then t18=true; textBlood(textX(.25)) end
+        if idx>=45 and not t45 then t45=true; textBlood(textX(.5)) end
+        if idx>=72 and not t72 then t72=true; textBlood(textX(.75)) end
+        
+        task.wait(0.05)
+        timeElap = timeElap + 0.05
+        stepCount = stepCount + 1
+        if currentP >= 1 and pending == 0 then break end
+    end
+
+    exiting=true
+    heartbeat:Disconnect()
+    
+    task.spawn(function()
+        local ex=0.8
+        local function fade(o,p) tw(o,ex,p,Enum.EasingStyle.Cubic) end
+        fade(scale,{Scale=1.06})
+        for _,o in ipairs({title,shadow,shine,pct}) do fade(o,{TextTransparency=1}) end
+        for _,o in ipairs({bar,fill}) do fade(o,{BackgroundTransparency=1}) end
+        fade(stroke,{Transparency=1})
+        for _,o in ipairs(blood:GetChildren()) do if o:IsA("Frame") then fade(o,{BackgroundTransparency=1}) end end
+        fade(vig,{ImageTransparency=1})
+        fade(bg,{BackgroundTransparency=1})
+        fade(blur,{Size=0})
+        fade(cc,{Contrast=0,TintColor=c3(255,255,255)})
+        task.wait(ex+.05)
+        gui:Destroy()
+        if blur then blur:Destroy() end
+        if cc then cc:Destroy() end
     end)
 end
 
@@ -322,7 +346,7 @@ function OxireunUI:SendNotification(title, text, duration, ...)
         targetGui:SetAttribute("OxNotif", true) 
         targetGui.ResetOnSpawn = false
         targetGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        targetGui.DisplayOrder = 101 
+        targetGui.DisplayOrder = 5 
         pcall(function() targetGui.Parent = core end)
         if not targetGui.Parent and pg then targetGui.Parent = pg end
     end
@@ -508,7 +532,7 @@ function OxireunUI:NewWindow(title, ...)
     ScreenGui:SetAttribute("OxMain", true) 
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ScreenGui.DisplayOrder = 10 
+    ScreenGui.DisplayOrder = 1 
     
     local MainFrame = inst("Frame")
     MainFrame.Name = "MainWindow"
@@ -578,6 +602,8 @@ function OxireunUI:NewWindow(title, ...)
         
         logoImg.Parent = FloatingLogo
         FloatingLogo.Parent = ScreenGui
+        
+        table.insert(OxireunUI.PreloadQueue, logoId)
         
         local isGuiOpen = true
         
@@ -827,6 +853,8 @@ function OxireunUI:NewWindow(title, ...)
             fCorner.CornerRadius = shape == 2 and ud(0,4) or ud(1,0)
             fCorner.Parent = img
             img.Parent = FooterFrame
+            
+            table.insert(OxireunUI.PreloadQueue, icon)
         end
         
         local lbl = inst("TextLabel")
@@ -1258,7 +1286,7 @@ function OxireunUI:NewWindow(title, ...)
                 OptGui:SetAttribute("OxDrop", true)
                 OptGui.ResetOnSpawn = false
                 OptGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-                OptGui.DisplayOrder = 12 
+                OptGui.DisplayOrder = 3 
                 OptGui.Parent = ScreenGui
                 
                 local h = math.clamp((#opts * 28) + ((#opts - 1) * 4) + 12, 40, 160)
