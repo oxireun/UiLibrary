@@ -89,9 +89,6 @@ if game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end -- Pre
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/2049.lua"))()
 
--- loading screen
-
-Library:LoadingScreen("DEXTER")
 
 local Window = Library:NewWindow(
     "Oxireun Script", -- Window Title
