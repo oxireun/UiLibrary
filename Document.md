@@ -76,6 +76,11 @@ It auto-preloads your icons in the background and features a smooth, decreasing 
 Library:SendNotification("Success!", "Script loaded perfectly.", 3, 128337196312757, 2, "green")
 ```
 
+## Allow multiple gui
+```lua
+game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end
+```
+
 ---
 
 ## Full Example Script
