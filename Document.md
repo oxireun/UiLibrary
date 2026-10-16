@@ -84,9 +84,8 @@ Here is a complete, working example using all the features of the Oxireun UI Lib
 
 ```lua
 
--- Anti-Duplicate: Prevents the UI from duplicating if executed multiple times
-
-if game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end -- Prevents duplicate UIs
+-- block anti multiple gui if you add this line you can use multiple guis(don't destroy gui).
+if game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oxireun/UiLibrary/refs/heads/main/2049.lua"))()
 
