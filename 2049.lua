@@ -102,23 +102,30 @@ local ELEMENT_SIZES = {
     ToggleHeight = 32, TextboxHeight = 32, DropdownHeight = 32, SectionSpacing = 6
 }
 
-function OxireunUI:LoadingScreen(titleText)
+function OxireunUI:LoadingScreen(titleText, iconsToLoad)
     local lg = game:GetService("Lighting")
     local pg = lplr:WaitForChild("PlayerGui")
     local tText = titleText or "DEXTER"
-    for _,v in ipairs({pg:FindFirstChild("DexterLoading"),lg:FindFirstChild("DexterBlur"),lg:FindFirstChild("DexterCC")}) do if v then v:Destroy() end end
+    
+    for _,v in ipairs({pg:FindFirstChild("DexterLoading"),lg:FindFirstChild("DexterBlur"),lg:FindFirstChild("DexterCC")}) do 
+        if v then v:Destroy() end 
+    end
+    
     local function n(c,p,t)
         local o=inst(c)
         for k,v in pairs(t or {}) do o[k]=v end
         o.Parent=p
         return o
     end
+    
     local function corner(o) n("UICorner",o,{CornerRadius=ud(1,0)}) end
+    
     local function tw(o,d,p,s,e)
         local x=ts:Create(o,ti(d,s or Enum.EasingStyle.Quad,e or Enum.EasingDirection.Out),p)
         x:Play()
         return x
     end
+    
     local blur=n("BlurEffect",lg,{Name="DexterBlur",Size=0})
     local cc=n("ColorCorrectionEffect",lg,{Name="DexterCC",TintColor=c3(255,230,230),Contrast=.2})
     local gui=n("ScreenGui",pg,{Name="DexterLoading",IgnoreGuiInset=true,ResetOnSpawn=false,DisplayOrder=9999})
@@ -141,11 +148,14 @@ function OxireunUI:LoadingScreen(titleText)
     n("UIGradient",fill,{Color=cseq({csk(0,c3(80,0,0)),csk(.7,c3(175,0,0)),csk(1,c3(240,20,20))})})
     local pct=n("TextLabel",hub,{AnchorPoint=v2(.5,.5),Position=ud2(.5,0,.84,0),Size=ud2(1,0,.08,0),BackgroundTransparency=1,Font=Enum.Font.GothamMedium,Text="0%",TextColor3=c3(180,100,100),TextSize=13,TextTransparency=1,ZIndex=5})
     local blood=n("Frame",hub,{Size=ud2(1,0,1,0),BackgroundTransparency=1,ZIndex=8})
+    
     local exiting=false
+    
     local function textX(r)
         local w=((title.TextBounds.X>0 and title.TextBounds.X/hub.AbsoluteSize.X) or math.clamp(#tText*.05,.2,.7))*.85
         return .5-w/2+w*r
     end
+    
     local function textBlood(x)
         if exiting or not gui.Parent then return end
         local y=.46
@@ -165,6 +175,7 @@ function OxireunUI:LoadingScreen(titleText)
             end)
         end)
     end
+    
     local function barBlood(x,y,len,speed)
         if exiting or not gui.Parent then return end
         local w=math.random(2,3)
@@ -179,9 +190,11 @@ function OxireunUI:LoadingScreen(titleText)
             tw(drop,2.2,{Position=ud2(x,0,y,len+math.random(50,95)),BackgroundTransparency=.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In)
         end)
     end
+    
     local heartbeat=rs.RenderStepped:Connect(function()
         vig.ImageTransparency=.45+(math.sin(tick()*3.2)+1)/2*.2
     end)
+    
     tw(blur,.8,{Size=20})
     tw(bg,.7,{BackgroundTransparency=.15})
     task.wait(.35)
@@ -189,6 +202,7 @@ function OxireunUI:LoadingScreen(titleText)
     tw(shadow,.9,{TextTransparency=.3},Enum.EasingStyle.Cubic)
     tw(shine,.9,{TextTransparency=0},Enum.EasingStyle.Cubic)
     task.wait(.4)
+    
     task.spawn(function()
         while not exiting and gui.Parent do
             sg.Offset=v2(-1,0)
@@ -196,13 +210,43 @@ function OxireunUI:LoadingScreen(titleText)
             task.wait(1.8)
         end
     end)
+    
     tw(bar,.5,{BackgroundTransparency=.2})
     tw(stroke,.5,{Transparency=.3})
     tw(fill,.5,{BackgroundTransparency=0})
     tw(pct,.5,{TextTransparency=0})
+    
+    local loadedIcons = 0
+    local totalIcons = 0
+    
+    if type(iconsToLoad) == "table" then
+        local imgs = {}
+        for _, id in ipairs(iconsToLoad) do
+            local im = inst("ImageLabel")
+            im.Image = tonumber(id) and "rbxthumb://type=Asset&id="..id.."&w=150&h=150" or id
+            table.insert(imgs, im)
+        end
+        totalIcons = #imgs
+        if totalIcons > 0 then
+            task.spawn(function()
+                for _, im in ipairs(imgs) do
+                    pcall(function() cp:PreloadAsync({im}) end)
+                    loadedIcons = loadedIcons + 1
+                end
+            end)
+        end
+    end
+    
     local start=.5-BW/2
     for i=1,100 do
         if not gui.Parent then break end
+        
+        if i == 90 and totalIcons > 0 then
+            while loadedIcons < totalIcons do
+                task.wait(0.1)
+            end
+        end
+        
         local p=i/100
         tw(fill,.06,{Size=ud2(p,0,1,0)},Enum.EasingStyle.Linear)
         pct.Text=math.floor(p*100).."%"
@@ -212,6 +256,7 @@ function OxireunUI:LoadingScreen(titleText)
         elseif i==72 then textBlood(textX(.75)) end
         task.wait(math.random(3,6)/100)
     end
+    
     exiting=true
     heartbeat:Disconnect()
     task.wait(.1)
@@ -234,19 +279,6 @@ function OxireunUI:LoadingScreen(titleText)
     gui:Destroy()
     if blur then blur:Destroy() end
     if cc then cc:Destroy() end
-end
-
-function OxireunUI:PreloadIcons(icons)
-    if type(icons) ~= "table" then icons = {icons} end
-    task.spawn(function()
-        local cache = {}
-        for _, id in pairs(icons) do
-            local im = inst("ImageLabel")
-            im.Image = tonumber(id) and "rbxthumb://type=Asset&id="..id.."&w=150&h=150" or id
-            table.insert(cache, im)
-        end
-        pcall(function() cp:PreloadAsync(cache) end)
-    end)
 end
 
 local function parseSmartArgs(...)
@@ -337,10 +369,6 @@ function OxireunUI:SendNotification(title, text, duration, ...)
         else
             inst("UICorner", img).CornerRadius = ud(1, 0)
         end
-        
-        task.spawn(function()
-            pcall(function() cp:PreloadAsync({img}) end)
-        end)
     end
 
     local textOffset = icon and 50 or 10
@@ -517,8 +545,14 @@ function OxireunUI:NewWindow(title, ...)
     rgbBorder.Name = "RGBBorder"
     rgbBorder.Color = RGBColors[1]
     rgbBorder.Thickness = 2
-    rgbBorder.Transparency = 0
+    rgbBorder.Transparency = 1
     rgbBorder.Parent = MainFrame
+    
+    local mScale = inst("UIScale")
+    mScale.Scale = 0.8
+    mScale.Parent = MainFrame
+    ts:Create(mScale, ti(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
+    ts:Create(rgbBorder, ti(0.4), {Transparency = 0}):Play()
     
     local FloatingLogo, logoBorder
     local activeDropdowns = {}
@@ -562,14 +596,10 @@ function OxireunUI:NewWindow(title, ...)
         logoImg.Parent = FloatingLogo
         FloatingLogo.Parent = ScreenGui
         
-        task.spawn(function()
-            local tempImg = inst("ImageLabel")
-            tempImg.Image = logoImg.Image
-            tempImg.Visible = false
-            tempImg.Parent = ScreenGui
-            pcall(function() cp:PreloadAsync({tempImg}) end)
-            tempImg:Destroy()
-        end)
+        local lScale = inst("UIScale")
+        lScale.Scale = 0
+        lScale.Parent = FloatingLogo
+        ts:Create(lScale, ti(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
         
         local isGuiOpen = true
         
@@ -614,7 +644,10 @@ function OxireunUI:NewWindow(title, ...)
                 isGuiOpen = not isGuiOpen
                 MainFrame.Visible = isGuiOpen
                 
-                if not isGuiOpen then
+                if isGuiOpen then
+                    mScale.Scale = 0.8
+                    ts:Create(mScale, ti(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
+                else
                     for drop, _ in pairs(activeDropdowns) do
                         if drop and drop.Parent then drop.Parent:Destroy(); activeDropdowns[drop] = nil end
                     end
