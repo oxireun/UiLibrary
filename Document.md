@@ -106,9 +106,7 @@ Window:SetFooter(
     2              -- Shape (1 = Round, 2 = Square)
 )
 
--- ========================================== --
--- MAIN SECTION
--- ========================================== --
+
 local MainSection = Window:NewSection("Main") -- Tab Name
 
 MainSection:CreateButton("Test Notification", function()
@@ -139,9 +137,8 @@ MainSection:CreateSlider("WalkSpeed", 16, 100, 16, function(val) -- Name, Min Va
     end
 end)
 
--- ========================================== --
--- CREDITS SECTION
--- ========================================== --
+
+
 local CreditsSection = Window:NewSection("Credits") -- Tab Name
 
 CreditsSection:CreateButton("Copy YouTube", function()
