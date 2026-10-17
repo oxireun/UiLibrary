@@ -9,6 +9,10 @@ local lplr = plrs.LocalPlayer
 
 local core = (gethui and gethui()) or game:GetService("CoreGui")
 
+local function genHash()
+    return hs:GenerateGUID(false):gsub("-", "")
+end
+
 local Colors = {
     Background = c3(15, 12, 22), SecondaryBg = c3(10, 8, 15), SectionBg = c3(15, 12, 22),
     Border = c3(120, 40, 220), Accent = c3(100, 30, 150), Text = c3(255, 255, 255),
@@ -132,18 +136,26 @@ function OxireunUI:SendNotification(title, text, duration, ...)
         end
     end
 
-    local targetGui = core:FindFirstChild("OxUI_Notifs") or game:GetService("CoreGui"):FindFirstChild("OxUI_Notifs")
+    local targetGui
+    for _, v in pairs(core:GetChildren()) do
+        if v:GetAttribute("OxNotif") then targetGui = v; break end
+    end
+    
     local pg = lplr:FindFirstChild("PlayerGui")
-    if not targetGui and pg then targetGui = pg:FindFirstChild("OxUI_Notifs") end
+    if not targetGui and pg then
+        for _, v in pairs(pg:GetChildren()) do
+            if v:GetAttribute("OxNotif") then targetGui = v; break end
+        end
+    end
 
     if not targetGui then
         targetGui = inst("ScreenGui")
-        targetGui.Name = "OxUI_Notifs"
+        targetGui.Name = genHash() 
+        targetGui:SetAttribute("OxNotif", true) 
         targetGui.ResetOnSpawn = false
         targetGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
         targetGui.DisplayOrder = 101 
-        pcall(function() targetGui.Parent = game:GetService("CoreGui") end)
-        if not targetGui.Parent then pcall(function() targetGui.Parent = core end) end
+        pcall(function() targetGui.Parent = core end)
         if not targetGui.Parent and pg then targetGui.Parent = pg end
     end
 
@@ -316,18 +328,53 @@ function OxireunUI:NewWindow(title, ...)
         end
     end
 
-    local existing = game:GetService("CoreGui"):FindFirstChild("OxireunUI") or core:FindFirstChild("OxireunUI")
-    local pg = lplr:FindFirstChild("PlayerGui")
-    if not existing and pg then existing = pg:FindFirstChild("OxireunUI") end
-    if existing then existing:Destroy() end
-
     local Window = {Title = title or "Oxireun UI", Sections = {}, CurrentSection = nil}
-    
+
+    for _, v in pairs(core:GetChildren()) do
+        if v:GetAttribute("OxMain") == Window.Title then v:Destroy() end
+    end
+    local pg = lplr:FindFirstChild("PlayerGui")
+    if pg then
+        for _, v in pairs(pg:GetChildren()) do
+            if v:GetAttribute("OxMain") == Window.Title then v:Destroy() end
+        end
+    end
+
     local ScreenGui = inst("ScreenGui")
-    ScreenGui.Name = "OxireunUI"
+    ScreenGui.Name = genHash()
+    ScreenGui:SetAttribute("OxMain", Window.Title) 
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.DisplayOrder = 10 
+
+    local marker = game:GetService("CoreGui"):FindFirstChild("OxireunUI")
+    if not marker then
+        marker = inst("Folder")
+        marker.Name = "OxireunUI"
+        pcall(function() marker.Parent = game:GetService("CoreGui") end)
+    end
+
+    local function checkCleanMarker()
+        task.defer(function()
+            local any = false
+            for _, v in pairs(core:GetChildren()) do
+                if v:GetAttribute("OxMain") then any = true break end
+            end
+            if pg then
+                for _, v in pairs(pg:GetChildren()) do
+                    if v:GetAttribute("OxMain") then any = true break end
+                end
+            end
+            if not any then
+                pcall(function()
+                    local m = game:GetService("CoreGui"):FindFirstChild("OxireunUI")
+                    if m then m:Destroy() end
+                end)
+            end
+        end)
+    end
+
+    ScreenGui.Destroying:Connect(checkCleanMarker)
     
     local MainFrame = inst("Frame")
     MainFrame.Name = "MainWindow"
@@ -648,17 +695,10 @@ function OxireunUI:NewWindow(title, ...)
             img.Position = ud2(0, 4, 0.5, -6)
             img.BackgroundTransparency = 1
             img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
-            img.ScaleType = Enum.ScaleType.Crop
-            img.ClipsDescendants = true
-            
-            local fCorner = inst("UICorner")
-            fCorner.CornerRadius = shape == 2 and ud(0,4) or ud(1,0)
-            fCorner.Parent = img
+            img.ScaleType = Enum.ScaleType.Fit
+            inst("UICorner", img).CornerRadius = shape == 2 and ud(0,4) or ud(1,0)
             img.Parent = FooterFrame
-            
-            task.spawn(function()
-                pcall(function() cp:PreloadAsync({img}) end)
-            end)
+            task.spawn(function() pcall(function() cp:PreloadAsync({img}) end) end)
         end
         
         local lbl = inst("TextLabel")
@@ -1229,8 +1269,7 @@ function OxireunUI:NewWindow(title, ...)
     end
     
     MainFrame.Parent = ScreenGui
-    pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
-    if not ScreenGui.Parent then pcall(function() ScreenGui.Parent = core end) end
+    pcall(function() ScreenGui.Parent = core end)
     if not ScreenGui.Parent then ScreenGui.Parent = lplr:WaitForChild("PlayerGui") end
     table.insert(self.Windows, Window)
     return Window
