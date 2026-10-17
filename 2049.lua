@@ -174,165 +174,140 @@ function OxireunUI:SendNotification(title, text, duration, ...)
         NotifContainer.Parent = targetGui
     end
 
-    task.spawn(function()
-        local img
-        if icon then
-            img = inst("ImageLabel")
-            img.Size = ud2(0, 30, 0, 30)
-            img.Position = ud2(0, 10, 0, 12)
-            img.BackgroundTransparency = 1
-            img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
-            img.ImageTransparency = 1
-            img.ScaleType = Enum.ScaleType.Fit
-            
-            if shape == 2 then
-                local icorner = inst("UICorner")
-                icorner.CornerRadius = ud(0, 6)
-                icorner.Parent = img
-            else
-                local icorner = inst("UICorner")
-                icorner.CornerRadius = ud(1, 0)
-                icorner.Parent = img
-            end
+    local img
+    if icon then
+        img = inst("ImageLabel")
+        img.Size = ud2(0, 30, 0, 30)
+        img.Position = ud2(0, 10, 0, 12)
+        img.BackgroundTransparency = 1
+        img.Image = tonumber(icon) and "rbxthumb://type=Asset&id="..icon.."&w=150&h=150" or icon
+        img.ImageTransparency = 1
+        img.ScaleType = Enum.ScaleType.Fit
+        
+        if shape == 2 then
+            local icorner = inst("UICorner")
+            icorner.CornerRadius = ud(0, 6)
+            icorner.Parent = img
+        else
+            local icorner = inst("UICorner")
+            icorner.CornerRadius = ud(1, 0)
+            icorner.Parent = img
         end
+    end
 
-        local textOffset = icon and 50 or 10
-        local availableWidth = 250 - textOffset - 15
-        local bounds = txtSvc:GetTextSize(text or "Message", 12, Fonts.Normal, v2(availableWidth, 9000))
-        local textHeight = math.clamp(bounds.Y, 20, 400)
-        local frameHeight = math.max(60, 26 + textHeight + 20)
+    local textOffset = icon and 50 or 10
+    local availableWidth = 250 - textOffset - 15
+    local bounds = txtSvc:GetTextSize(text or "Message", 12, Fonts.Normal, v2(availableWidth, 9000))
+    local textHeight = math.clamp(bounds.Y, 20, 400)
+    local frameHeight = math.max(60, 26 + textHeight + 20)
 
-        local NotifFrame = inst("Frame")
-        NotifFrame.Size = ud2(1, 0, 0, frameHeight)
-        NotifFrame.BackgroundColor3 = c3(255, 255, 255)
-        NotifFrame.BorderSizePixel = 0
-        NotifFrame.BackgroundTransparency = 1
-        
-        local corner = inst("UICorner")
-        corner.CornerRadius = ud(0, 8)
-        corner.Parent = NotifFrame
-        
-        local notifGrad = inst("UIGradient")
-        notifGrad.Color = cseq({csk(0, nCol.Hover), csk(1, nCol.Background)})
-        notifGrad.Rotation = 90
-        notifGrad.Parent = NotifFrame
-        
-        local stroke = inst("UIStroke")
-        stroke.Color = c3(255, 255, 255)
-        stroke.Thickness = 1.5
-        stroke.Transparency = 1
-        stroke.Parent = NotifFrame
+    local NotifFrame = inst("Frame")
+    NotifFrame.Size = ud2(1, 0, 0, frameHeight)
+    NotifFrame.BackgroundColor3 = c3(255, 255, 255)
+    NotifFrame.BorderSizePixel = 0
+    NotifFrame.BackgroundTransparency = 1
+    
+    local corner = inst("UICorner")
+    corner.CornerRadius = ud(0, 8)
+    corner.Parent = NotifFrame
+    
+    local notifGrad = inst("UIGradient")
+    notifGrad.Color = cseq({csk(0, nCol.Hover), csk(1, nCol.Background)})
+    notifGrad.Rotation = 90
+    notifGrad.Parent = NotifFrame
+    
+    local stroke = inst("UIStroke")
+    stroke.Color = c3(255, 255, 255)
+    stroke.Thickness = 1.5
+    stroke.Transparency = 1
+    stroke.Parent = NotifFrame
 
-        local strokeGrad = inst("UIGradient")
-        strokeGrad.Color = cseq({csk(0, nCol.Accent), csk(1, nCol.Border)})
-        strokeGrad.Rotation = 45
-        strokeGrad.Parent = stroke
+    local strokeGrad = inst("UIGradient")
+    strokeGrad.Color = cseq({csk(0, nCol.Accent), csk(1, nCol.Border)})
+    strokeGrad.Rotation = 45
+    strokeGrad.Parent = stroke
 
-        if img then img.Parent = NotifFrame end
-        
-        local TitleLabel = inst("TextLabel")
-        TitleLabel.Size = ud2(1, -textOffset - 10, 0, 20)
-        TitleLabel.Position = ud2(0, textOffset, 0, 6)
-        TitleLabel.BackgroundTransparency = 1
-        TitleLabel.Text = title or "Notification"
-        TitleLabel.TextColor3 = nCol.Text
-        TitleLabel.TextSize = 14
-        TitleLabel.Font = Fonts.Bold
-        TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        TitleLabel.TextTransparency = 1
-        TitleLabel.TextScaled = true
-        TitleLabel.TextWrapped = true
-        local nTitleConst = inst("UITextSizeConstraint")
-        nTitleConst.MaxTextSize = 14
-        nTitleConst.MinTextSize = 9
-        nTitleConst.Parent = TitleLabel
-        TitleLabel.Parent = NotifFrame
-        
-        local TextLabel = inst("TextLabel")
-        TextLabel.Size = ud2(1, -textOffset - 10, 0, textHeight)
-        TextLabel.Position = ud2(0, textOffset, 0, 26)
-        TextLabel.BackgroundTransparency = 1 
-        TextLabel.Text = text or "Message"
-        TextLabel.TextColor3 = nCol.TextInactive
-        TextLabel.TextSize = 12
-        TextLabel.Font = Fonts.Normal
-        TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-        TextLabel.TextTransparency = 1
-        TextLabel.TextWrapped = true
-        TextLabel.Parent = NotifFrame
+    if img then img.Parent = NotifFrame end
+    
+    local TitleLabel = inst("TextLabel")
+    TitleLabel.Size = ud2(1, -textOffset - 10, 0, 20)
+    TitleLabel.Position = ud2(0, textOffset, 0, 6)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = title or "Notification"
+    TitleLabel.TextColor3 = nCol.Text
+    TitleLabel.TextSize = 14
+    TitleLabel.Font = Fonts.Bold
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.TextTransparency = 1
+    TitleLabel.TextScaled = true
+    TitleLabel.TextWrapped = true
+    local nTitleConst = inst("UITextSizeConstraint")
+    nTitleConst.MaxTextSize = 14
+    nTitleConst.MinTextSize = 9
+    nTitleConst.Parent = TitleLabel
+    TitleLabel.Parent = NotifFrame
+    
+    local TextLabel = inst("TextLabel")
+    TextLabel.Size = ud2(1, -textOffset - 10, 0, textHeight)
+    TextLabel.Position = ud2(0, textOffset, 0, 26)
+    TextLabel.BackgroundTransparency = 1 
+    TextLabel.Text = text or "Message"
+    TextLabel.TextColor3 = nCol.TextInactive
+    TextLabel.TextSize = 12
+    TextLabel.Font = Fonts.Normal
+    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TextLabel.TextTransparency = 1
+    TextLabel.TextWrapped = true
+    TextLabel.Parent = NotifFrame
 
-        local BarBg = inst("Frame")
-        BarBg.Size = ud2(1, -20, 0, 4)
-        BarBg.Position = ud2(0, 10, 1, -10)
-        BarBg.BackgroundColor3 = nCol.SecondaryBg
-        BarBg.BorderSizePixel = 0
-        BarBg.BackgroundTransparency = 1
-        inst("UICorner", BarBg).CornerRadius = ud(1, 0)
-        BarBg.Parent = NotifFrame
+    local BarBg = inst("Frame")
+    BarBg.Size = ud2(1, -20, 0, 4)
+    BarBg.Position = ud2(0, 10, 1, -10)
+    BarBg.BackgroundColor3 = nCol.SecondaryBg
+    BarBg.BorderSizePixel = 0
+    BarBg.BackgroundTransparency = 1
+    inst("UICorner", BarBg).CornerRadius = ud(1, 0)
+    BarBg.Parent = NotifFrame
 
-        local Bar = inst("Frame")
-        Bar.Size = ud2(1, 0, 1, 0)
-        Bar.BackgroundColor3 = c3(255, 255, 255)
-        Bar.BorderSizePixel = 0
-        Bar.BackgroundTransparency = 1
-        inst("UICorner", Bar).CornerRadius = ud(1, 0)
-        
-        local barGrad = inst("UIGradient")
-        barGrad.Color = cseq({csk(0, nCol.Slider), csk(1, nCol.Border)})
-        barGrad.Parent = Bar
-        Bar.Parent = BarBg
+    local Bar = inst("Frame")
+    Bar.Size = ud2(1, 0, 1, 0)
+    Bar.BackgroundColor3 = c3(255, 255, 255)
+    Bar.BorderSizePixel = 0
+    Bar.BackgroundTransparency = 1
+    inst("UICorner", Bar).CornerRadius = ud(1, 0)
+    
+    local barGrad = inst("UIGradient")
+    barGrad.Color = cseq({csk(0, nCol.Slider), csk(1, nCol.Border)})
+    barGrad.Parent = Bar
+    Bar.Parent = BarBg
 
-        NotifFrame.Parent = NotifContainer
-        ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 0}):Play()
-        ts:Create(stroke, ti(0.3), {Transparency = 0}):Play()
-        ts:Create(TitleLabel, ti(0.3), {TextTransparency = 0}):Play()
-        ts:Create(TextLabel, ti(0.3), {TextTransparency = 0}):Play()
-        ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 0.4}):Play()
-        ts:Create(Bar, ti(0.3), {BackgroundTransparency = 0}):Play()
-        if img then ts:Create(img, ti(0.3), {ImageTransparency = 0}):Play() end
-        
-        task.delay(0.3, function() ts:Create(Bar, ti(duration, Enum.EasingStyle.Linear), {Size = ud2(0, 0, 1, 0)}):Play() end)
-        
-        task.delay(duration + 0.3, function()
-            ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 1}):Play()
-            ts:Create(stroke, ti(0.3), {Transparency = 1}):Play()
-            ts:Create(TitleLabel, ti(0.3), {TextTransparency = 1}):Play()
-            ts:Create(TextLabel, ti(0.3), {TextTransparency = 1}):Play()
-            ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 1}):Play()
-            ts:Create(Bar, ti(0.3), {BackgroundTransparency = 1}):Play()
-            if img then ts:Create(img, ti(0.3), {ImageTransparency = 1}):Play() end
-            task.wait(0.3)
-            NotifFrame:Destroy()
-        end)
+    NotifFrame.Parent = NotifContainer
+    ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 0}):Play()
+    ts:Create(stroke, ti(0.3), {Transparency = 0}):Play()
+    ts:Create(TitleLabel, ti(0.3), {TextTransparency = 0}):Play()
+    ts:Create(TextLabel, ti(0.3), {TextTransparency = 0}):Play()
+    ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 0.4}):Play()
+    ts:Create(Bar, ti(0.3), {BackgroundTransparency = 0}):Play()
+    if img then ts:Create(img, ti(0.3), {ImageTransparency = 0}):Play() end
+    
+    task.delay(0.3, function() ts:Create(Bar, ti(duration, Enum.EasingStyle.Linear), {Size = ud2(0, 0, 1, 0)}):Play() end)
+    
+    task.delay(duration + 0.3, function()
+        ts:Create(NotifFrame, ti(0.3), {BackgroundTransparency = 1}):Play()
+        ts:Create(stroke, ti(0.3), {Transparency = 1}):Play()
+        ts:Create(TitleLabel, ti(0.3), {TextTransparency = 1}):Play()
+        ts:Create(TextLabel, ti(0.3), {TextTransparency = 1}):Play()
+        ts:Create(BarBg, ti(0.3), {BackgroundTransparency = 1}):Play()
+        ts:Create(Bar, ti(0.3), {BackgroundTransparency = 1}):Play()
+        if img then ts:Create(img, ti(0.3), {ImageTransparency = 1}):Play() end
+        task.wait(0.3)
+        NotifFrame:Destroy()
     end)
 end
 
 function OxireunUI.new()
     local self = setmetatable({}, OxireunUI)
     self.Windows = {}
-
-    pcall(function()
-        local cg = game:GetService("CoreGui")
-        for _, v in pairs(cg:GetChildren()) do
-            if (v.Name == "OxireunUI" and v:GetAttribute("OxMarker")) or v:GetAttribute("OxMain") then
-                v:Destroy()
-            end
-        end
-    end)
-    for _, v in pairs(core:GetChildren()) do
-        if v.Name == "OxireunUI" or v:GetAttribute("OxMain") then
-            v:Destroy()
-        end
-    end
-    local pg = lplr:FindFirstChild("PlayerGui")
-    if pg then
-        for _, v in pairs(pg:GetChildren()) do
-            if v.Name == "OxireunUI" or v:GetAttribute("OxMain") then
-                v:Destroy()
-            end
-        end
-    end
-
     return self
 end
 
@@ -351,25 +326,23 @@ function OxireunUI:NewWindow(title, ...)
         end
     end
 
+    local allowMulti = _G.MultiGui or _G.MultiUI or _G.OxireunMulti
+    if not allowMulti then
+        for _, v in pairs(core:GetChildren()) do
+            if v:GetAttribute("OxMain") then v:Destroy() end
+        end
+        local pg = lplr:FindFirstChild("PlayerGui")
+        if pg then
+            for _, v in pairs(pg:GetChildren()) do
+                if v:GetAttribute("OxMain") then v:Destroy() end
+            end
+        end
+    end
+
     local Window = {Title = title or "Oxireun UI", Sections = {}, CurrentSection = nil}
     
     local ScreenGui = inst("ScreenGui")
-    if not core:FindFirstChild("OxireunUI") and not game:GetService("CoreGui"):FindFirstChild("OxireunUI") then
-        ScreenGui.Name = "OxireunUI"
-    else
-        ScreenGui.Name = "OxireunUI_" .. genHash()
-    end
-
-    pcall(function()
-        local cg = game:GetService("CoreGui")
-        if not cg:FindFirstChild("OxireunUI") then
-            local marker = inst("Folder")
-            marker.Name = "OxireunUI"
-            marker:SetAttribute("OxMarker", true)
-            marker.Parent = cg
-        end
-    end)
-
+    ScreenGui.Name = genHash()
     ScreenGui:SetAttribute("OxMain", true) 
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
