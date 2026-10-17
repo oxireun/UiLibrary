@@ -13,10 +13,13 @@ We use **Smart Arguments**. You don't need to memorize the order! Just pass what
 *   **Big Number:** Logo ID for the floating icon (e.g., `128337196312757`).
 *   **Small Number:** Shape of the floating icon (`1` = Round, `2` = Square).
 * available colors`black` `grey` `red` `blue` `green` `pink` `orange` `yellow`
-* if you delete the decal id, it will open without icon.
-
+* 1 with icon(logo).
 ```lua
 local Window = Library:NewWindow("Oxireun Script", 128337196312757, 1, "orange")
+```
+* 2 without icoon(logo).
+```lua
+local Window = Library:NewWindow("Oxireun Script","orange")
 ```
 
 * 
