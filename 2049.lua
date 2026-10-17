@@ -310,6 +310,29 @@ end
 function OxireunUI.new()
     local self = setmetatable({}, OxireunUI)
     self.Windows = {}
+
+    pcall(function()
+        local cg = game:GetService("CoreGui")
+        for _, v in pairs(cg:GetChildren()) do
+            if (v.Name == "OxireunUI" and v:GetAttribute("OxMarker")) or v:GetAttribute("OxMain") then
+                v:Destroy()
+            end
+        end
+    end)
+    for _, v in pairs(core:GetChildren()) do
+        if v.Name == "OxireunUI" or v:GetAttribute("OxMain") then
+            v:Destroy()
+        end
+    end
+    local pg = lplr:FindFirstChild("PlayerGui")
+    if pg then
+        for _, v in pairs(pg:GetChildren()) do
+            if v.Name == "OxireunUI" or v:GetAttribute("OxMain") then
+                v:Destroy()
+            end
+        end
+    end
+
     return self
 end
 
@@ -329,52 +352,28 @@ function OxireunUI:NewWindow(title, ...)
     end
 
     local Window = {Title = title or "Oxireun UI", Sections = {}, CurrentSection = nil}
-
-    for _, v in pairs(core:GetChildren()) do
-        if v:GetAttribute("OxMain") == Window.Title then v:Destroy() end
-    end
-    local pg = lplr:FindFirstChild("PlayerGui")
-    if pg then
-        for _, v in pairs(pg:GetChildren()) do
-            if v:GetAttribute("OxMain") == Window.Title then v:Destroy() end
-        end
-    end
-
+    
     local ScreenGui = inst("ScreenGui")
-    ScreenGui.Name = genHash()
-    ScreenGui:SetAttribute("OxMain", Window.Title) 
+    if not core:FindFirstChild("OxireunUI") and not game:GetService("CoreGui"):FindFirstChild("OxireunUI") then
+        ScreenGui.Name = "OxireunUI"
+    else
+        ScreenGui.Name = "OxireunUI_" .. genHash()
+    end
+
+    pcall(function()
+        local cg = game:GetService("CoreGui")
+        if not cg:FindFirstChild("OxireunUI") then
+            local marker = inst("Folder")
+            marker.Name = "OxireunUI"
+            marker:SetAttribute("OxMarker", true)
+            marker.Parent = cg
+        end
+    end)
+
+    ScreenGui:SetAttribute("OxMain", true) 
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.DisplayOrder = 10 
-
-    local marker = game:GetService("CoreGui"):FindFirstChild("OxireunUI")
-    if not marker then
-        marker = inst("Folder")
-        marker.Name = "OxireunUI"
-        pcall(function() marker.Parent = game:GetService("CoreGui") end)
-    end
-
-    local function checkCleanMarker()
-        task.defer(function()
-            local any = false
-            for _, v in pairs(core:GetChildren()) do
-                if v:GetAttribute("OxMain") then any = true break end
-            end
-            if pg then
-                for _, v in pairs(pg:GetChildren()) do
-                    if v:GetAttribute("OxMain") then any = true break end
-                end
-            end
-            if not any then
-                pcall(function()
-                    local m = game:GetService("CoreGui"):FindFirstChild("OxireunUI")
-                    if m then m:Destroy() end
-                end)
-            end
-        end)
-    end
-
-    ScreenGui.Destroying:Connect(checkCleanMarker)
     
     local MainFrame = inst("Frame")
     MainFrame.Name = "MainWindow"
