@@ -77,8 +77,9 @@ Library:SendNotification("Success!", "Script loaded perfectly.", 3, 128337196312
 ```
 
 ## Allow multiple gui
+* put this in 1st line(anove everything).
 ```lua
-game:GetService("CoreGui"):FindFirstChild("OxireunUI") then return end
+_G.MultiGui = true
 ```
 
 ---
