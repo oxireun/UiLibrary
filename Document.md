@@ -23,7 +23,7 @@ local Window = Library:NewWindow("Oxireun Script", 128337196312757, 1, "orange")
 ## Adding a Footer
 Add a sleek watermark or credit to the bottom of the UI. Uses Smart Arguments (Text, IconID, Shape).
 ```lua
-Window:SetFooter("yt: oxireun", 128337196312757, 2)
+Window:SetFooter("yt: oxireun", 128337196312757, 1)
 ```
 
 ## Creating Sections (Tabs)
@@ -48,8 +48,8 @@ end)
 ### Slider
 A smooth slider for adjusting numeric values. (Name, Min, Max, Default, Callback)
 ```lua
-MainSection:CreateSlider("WalkSpeed", 16, 100, 16, function(value)
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+MainSection:CreateSlider("WalkSpeed", 10, 100, 16, function(value)
+    print(value)
 end)
 ```
 
